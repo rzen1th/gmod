@@ -464,7 +464,7 @@ function SWEP:SecondaryAttack()
 				end
 				self.LastSalvageAttempt=Time
 				
-			elseif IsValid(Ent) and (Ent:GetClass() == "prop_physics" or Ent:GetClass() == "prop_ragdoll")
+			elseif IsValid(Ent) and (table.HasValue({"prop_physics", "prop_physics_multiplayer", "prop_ragdoll"}, Ent:GetClass()))
 					and (!CPPI or Ent:CPPIGetOwner() == self.Owner) 
 					and IsValid(Ent:GetPhysicsObject()) then
 				
