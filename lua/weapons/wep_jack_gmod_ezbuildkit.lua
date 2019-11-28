@@ -481,7 +481,7 @@ function SWEP:SecondaryAttack()
 					return
 				end
 				
-				-- TODO this is where we check if stuff is fleshy or clothy (organic)
+				local fleshy = table.HasValue({"flesh", "zombieflesh", "antlion"},  Ent:GetPhysicsObject():GetMaterial())
 				
 				for matType, ratio in pairs(matTbl) do
 				
@@ -494,6 +494,7 @@ function SWEP:SecondaryAttack()
 						local cube = ents.Create("ent_jack_gmod_ezmatcube")
 						cube.Large = false
 						cube.MaterialType = matType
+						cube.Flesh = fleshy
 						cube:SetPos(Ent:GetPos())	
 						cube:SetAngles(AngleRand())
 						cube:Spawn()
@@ -512,6 +513,7 @@ function SWEP:SecondaryAttack()
 							local cube = ents.Create("ent_jack_gmod_ezmatcube")
 							cube.Large = (i > smallCount)
 							cube.MaterialType = matType
+							cube.Flesh = fleshy
 							cube:SetPos(pos + Vector(0, 0, 20) + VectorRand() * 10)
 							cube:SetAngles(AngleRand())
 							cube:Spawn()
