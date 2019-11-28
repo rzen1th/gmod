@@ -1330,7 +1330,7 @@ JMod_EZnutrientsCrateSize=20
 
 JMod_MaterialTypes = {
 	["metal"] = {
-		Material = {"phoenix_storms/MetalSet_1-2", "models/props_pipes/GutterMetal01a", "phoenix_storms/dome", "phoenix_storms/cube", "phoenix_storms/gear", "models/props_pipes/Pipesystem01a_skin3", "models/props_pipes/GutterMetal01a"}, 
+		Material = {"phoenix_storms/MetalSet_1-2", "models/props_pipes/GutterMetal01a", "phoenix_storms/dome", "phoenix_storms/cube", "models/props_debris/metalwall001a", "models/props_pipes/Pipesystem01a_skin3", "models/props_pipes/GutterMetal01a"}, 
 		PhysMaterial = "metal", 
 		ColSound = "Canister.ImpactHard"
 	},
@@ -1355,7 +1355,7 @@ JMod_MaterialTypes = {
 		ColSound = "Rubber_Tire.ImpactHard"
 	},
 	["organic"] = {
-		Material = {"phoenix_storms/ps_grass", "models/props_c17/paper01"},
+		Material = {"models/props_junk/cardboard_boxes001a", "phoenix_storms/ps_grass", "models/props_c17/paper01"},
 		PhysMaterial = "dirt", 
 		ColSound = "Dirt.BulletImpact"
 	},
