@@ -32,6 +32,7 @@ if SERVER then
 
 		self.NextLoad=0
 		self.Loaded=false
+		self.DamageThreshold = (self.Large and 120) or 50
 		
 		if JMod_MaterialTypes[self.MaterialType] then 
 			if self.MaterialType == "organic" and self.Flesh then
@@ -69,6 +70,14 @@ if SERVER then
 			self:EmitSound(self.ColSound or "Plastic_Box.ImpactHard")
 		end
 
+	end
+	
+	function ENT:OnTakeDamage(dmginfo)
+		self:TakePhysicsDamage(dmginfo)
+		if(dmginfo:GetDamage()>self.DamageThreshold)then
+			local Pos=self:GetPos()
+			self:Remove()
+		end
 	end
 
 elseif CLIENT then

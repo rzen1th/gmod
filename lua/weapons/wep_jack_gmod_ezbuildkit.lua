@@ -514,13 +514,20 @@ function SWEP:SecondaryAttack()
 							cube.Large = (i > smallCount)
 							cube.MaterialType = matType
 							cube.Flesh = fleshy
-							cube:SetPos(pos + Vector(0, 0, 20) + VectorRand() * 10)
+							cube:SetPos(pos + Vector(0, 0, 20) + VectorRand() * 10) -- TODO don't spray
 							cube:SetAngles(AngleRand())
 							cube:Spawn()
 							cube:Activate()
 						end)
 					end
-					
+					self:SetNextSecondaryFire(CurTime() + 2)
+					sound.Play("snds_jack_gmod/ez_tools/hit.wav",self:GetPos(),60,math.random(80,120))
+					sound.Play("snds_jack_gmod/ez_tools/"..math.random(1,27)..".wav",self:GetPos(),60,math.random(80,120))
+					---
+					local eff=EffectData()
+					eff:SetOrigin(pos+VectorRand())
+					eff:SetScale(0.5) -- TODO scale with OBB size
+					util.Effect("eff_jack_gmod_ezbuildsmoke",eff,true,true)
 					Ent:Remove()
 					
 				end
