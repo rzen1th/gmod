@@ -503,7 +503,7 @@ function SWEP:SecondaryAttack()
 						timer.Simple(0.1, function()
 							if IsValid(cube) and IsValid(cube:GetPhysicsObject()) then 
 								cube:GetPhysicsObject():SetMass(diffMass) 
-								cube:SetModelScale(0.5 + diffMass/10)
+								cube:SetModelScale(0.5 + diffMass/20)
 							end
 						end)
 					end
