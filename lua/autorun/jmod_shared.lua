@@ -1329,13 +1329,41 @@ JMod_EZnutrientsCrateSize=20
 -- add the crate smoke flare
 
 JMod_MaterialTypes = {
-	["metal"] = {Material = "phoenix_storms/MetalSet_1-2", PhysMaterial = "metal", ColSound = "Canister.ImpactHard"},
-	["plastic"] = {Material = "hunter/myplastic", PhysMaterial = "plastic", ColSound = "Plastic_Box.ImpactHard"},
-	["glass"] = {Material = "models/props_combine/citadel_cable", PhysMaterial = "glass", ColSound = "Glass.ImpactHard"},
-	["stone"] = {Material = "models/props_wasteland/concretewall064b", PhysMaterial = "stone", ColSound = "Concrete_Block.ImpactHard"},
-	["rubber"] = {Material = "phoenix_storms/car_tire", PhysMaterial = "rubber", ColSound = "Rubber_Tire.ImpactHard"},
-	["organic"] = {Material = "phoenix_storms/ps_grass", PhysMaterial = "dirt", ColSound = "Dirt.BulletImpact"},
-	["wood"] = {Material = "phoenix_storms/wood", PhysMaterial = "wood", ColSound = "Wood_Solid.ImpactHard"},
+	["metal"] = {
+		Material = {"phoenix_storms/MetalSet_1-2", "models/props_pipes/GutterMetal01a", "phoenix_storms/dome", "phoenix_storms/cube", "phoenix_storms/gear", "models/props_pipes/Pipesystem01a_skin3", "models/props_pipes/GutterMetal01a"}, 
+		PhysMaterial = "metal", 
+		ColSound = "Canister.ImpactHard"
+	},
+	["plastic"] = {
+		Material = {"hunter/myplastic", "phoenix_storms/plastic", "models/xqm/rails/gumball_1"}, 
+		PhysMaterial = "plastic", 
+		ColSound = "Plastic_Box.ImpactHard"
+	},
+	["glass"] = {
+		Material = {"models/props_combine/citadel_cable"}, 
+		PhysMaterial = "glass", 
+		ColSound = "Glass.ImpactHard"
+	},
+	["stone"] = {
+		Material = {"models/props_wasteland/concretewall064b"}, 
+		PhysMaterial = "stone", 
+		ColSound = "Concrete_Block.ImpactHard"
+	},
+	["rubber"] = {
+		Material = {"phoenix_storms/car_tire"}, 
+		PhysMaterial = "rubber", 
+		ColSound = "Rubber_Tire.ImpactHard"
+	},
+	["organic"] = {
+		Material = {"phoenix_storms/ps_grass", "models/props_c17/paper01"},
+		PhysMaterial = "dirt", 
+		ColSound = "Dirt.BulletImpact"
+	},
+	["wood"] = {
+		Material = {"phoenix_storms/wood", "models/props_wasteland/wood_fence01a"}, 
+		PhysMaterial = "wood", 
+		ColSound = "Wood_Solid.ImpactHard"
+	},
 }
 
 -- https://developer.valvesoftware.com/wiki/Material_surface_properties

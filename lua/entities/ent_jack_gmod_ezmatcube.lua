@@ -34,13 +34,12 @@ if SERVER then
 		self.Loaded=false
 		
 		if JMod_MaterialTypes[self.MaterialType] then 
-			print(self.MaterialType)
 			if self.MaterialType == "organic" and self.Flesh then
 				self:SetMaterial("models/flesh")
 				self:GetPhysicsObject():SetMaterial("flesh")
 				self.ColSound = "Flesh_Bloody.ImpactHard"
 			else
-				self:SetMaterial(JMod_MaterialTypes[self.MaterialType].Material)
+				self:SetMaterial(table.Random(JMod_MaterialTypes[self.MaterialType].Material))
 				self:GetPhysicsObject():SetMaterial(JMod_MaterialTypes[self.MaterialType].PhysMaterial)
 				self.ColSound = JMod_MaterialTypes[self.MaterialType].ColSound
 			end
