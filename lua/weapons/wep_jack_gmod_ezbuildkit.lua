@@ -486,6 +486,7 @@ function SWEP:SecondaryAttack()
 				for matType, ratio in pairs(matTbl) do
 				
 					local effectiveMass = math.Round(mass * ratio)
+					if matType == "metal" then effectiveMass = math.Round(effectiveMass ^ 0.75) end
 					local diffMass = effectiveMass % 10
 					local largeCount = math.floor((effectiveMass / 10) / 8)
 					local smallCount = (effectiveMass / 10) % 8
