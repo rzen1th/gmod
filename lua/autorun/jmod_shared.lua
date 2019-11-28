@@ -1327,3 +1327,297 @@ JMod_EZnutrientsCrateSize=20
 -- yeet a wrench easter egg
 -- frickin like ADD npc factions to the whitelist yo, gosh damn
 -- add the crate smoke flare
+
+JMod_MaterialTypes = {
+	["metal"] = {Material = "phoenix_storms/MetalSet_1-2", PhysMaterial = "metal", ColSound = "Canister.ImpactHard"},
+	["plastic"] = {Material = "hunter/myplastic", PhysMaterial = "plastic", ColSound = "Plastic_Box.ImpactHard"},
+	["glass"] = {Material = "models/props_combine/citadel_cable", PhysMaterial = "glass", ColSound = "Glass.ImpactHard"},
+	["stone"] = {Material = "models/props_wasteland/concretewall064b", PhysMaterial = "stone", ColSound = "Concrete_Block.ImpactHard"},
+	["rubber"] = {Material = "phoenix_storms/car_tire", PhysMaterial = "rubber", ColSound = "Rubber_Tire.ImpactHard"},
+	["organic"] = {Material = "phoenix_storms/ps_grass", PhysMaterial = "dirt", ColSound = "Dirt.BulletImpact"},
+	["wood"] = {Material = "phoenix_storms/wood", PhysMaterial = "wood", ColSound = "Wood_Solid.ImpactHard"},
+}
+
+-- https://developer.valvesoftware.com/wiki/Material_surface_properties
+JMod_PhysMatMap = {
+	["default"] = {
+		plastic = 1
+	},
+	
+	-- Concrete / Rock
+	["baserock"] = {
+		stone = 1
+	},
+	["brick"] = {
+		stone = 1
+	},
+	["concrete"] = {
+		stone = 1
+	},
+	["concrete_block"] = {
+		stone = 1
+	},
+	["rock"] = {
+		stone = 1
+	},
+	
+	-- Metal
+	["canister"] = {
+		metal = 1
+	},
+	["chain"] = {
+		metal = 1
+	},
+	["chainlink"] = {
+		metal = 1
+	},
+	["combine_metal"] = {
+		metal = 1
+	},
+	["crowbar"] = {
+		metal = 1
+	},
+	["floating_metal_barrel"] = {
+		metal = 1
+	},
+	["grenade"] = {
+		metal = 0.3,
+		plastic = 0.7,
+	},
+	["gunship"] = {
+		metal = 0.3,
+		organic = 0.7
+	},
+	["metal"] = {
+		metal = 1
+	},
+	["metal_barrel"] = {
+		metal = 1
+	},
+	["metal_bouncy"] = {
+		metal = 1
+	},
+	["metal_box"] = {
+		metal = 1
+	},
+	["metal_seafloorcar"] = {
+		metal = 1
+	},
+	["metalgrate"] = {
+		metal = 1
+	},
+	["metalpanel"] = {
+		metal = 1
+	},
+	["metalvent"] = {
+		metal = 1
+	},
+	["metalvehicle"] = {
+		metal = 1
+	},
+	["paintcan"] = {
+		metal = 0.8,
+		organic = 0.2
+	},
+	["popcan"] = {
+		metal = 1
+	},
+	["roller"] = {
+		metal = 0.8,
+		rubber = 0.2,
+	},
+	["slipperymetal"] = {
+		metal = 1
+	},
+	["solidmetal"] = {
+		metal = 1
+	},
+	["strider"] = {
+		metal = 0.4,
+		organic = 0.6
+	},
+	["weapon"] = {
+		metal = 0.8,
+		plastic = 0.2
+	},
+
+	-- Wood
+	["wood"] = {
+		wood = 1,
+	},
+	["wood_box"] = {
+		wood = 1,
+	},
+	["wood_crate"] = {
+		wood = 1,
+	},
+	["wood_furniture"] = {
+		wood = 1,
+	},
+	["wood_lowdensity"] = {
+		wood = 1,
+	},
+	["wood_plank"] = {
+		wood = 1,
+	},
+	["wood_panel"] = {
+		wood = 1,
+	},
+	["wood_solid"] = {
+		wood = 1,
+	},
+	
+	-- Terrain
+	["dirt"] = {
+		organic = 0.7,
+		stone = 0.2,
+		glass = 0.1
+	},
+	["grass"] = {
+		organic = 0.9,
+		stone = 0.1
+	},
+	["gravel"] = {
+		organic = 0.6,
+		stone = 0.4
+	},
+	["mud"] = {
+		organic = 1
+	},
+	["quicksand"] = {
+		glass = 1
+	},
+	["sand"] = {
+		glass = 1
+	},
+	["slipperyslime"] = {
+		organic = 1
+	},
+	["antlionsand"] = {
+		organic = 0.6,
+		glass = 0.4
+	},
+	
+	-- Liquid / Frozen
+	["slime"] = {
+		organic = 1
+	},
+	--["water"] = {},
+	--["wade"] = {},
+	--["ice"] = {},
+	--["snow"] = {},
+	
+	-- Organic
+	["alienflesh"] = {
+		organic = 1
+	},
+	["antlion"] = {
+		organic = 1
+	},
+	["armorflesh"] = {
+		organic = 0.7,
+		metal = 0.3
+	},
+	["bloodyflesh"] = {
+		organic = 1
+	},
+	["flesh"] = {
+		organic = 1
+	},
+	["foliage"] = {
+		organic = 1
+	},
+	["watermelon"] = {
+		organic = 1
+	},
+	["zombieflesh"] = {
+		organic = 1
+	},
+	
+	-- Manufactured
+	["asphalt"] = {
+		stone = 1
+	},
+	["glass"] = {
+		glass = 1
+	},
+	["glassbottle"] = {
+		glass = 1
+	},
+	["combine_glass"] = {
+		glass = 0.9,
+		metal = 0.1
+	},
+	["tile"] = {
+		glass = 0.5,
+		stone = 0.5
+	},
+	["paper"] = {
+		organic = 0.8,
+		wood = 0.2
+	},
+	["papercup"] = {
+		organic = 0.8,
+		wood = 0.2
+	},
+	["cardboard"] = {
+		organic = 0.5,
+		wood = 0.5
+	},
+	["plaster"] = {
+		organic = 0.2,
+		plastic = 0.8
+	},
+	["plastic_barrel"] = {
+		plastic = 0.9,
+		rubber = 0.1
+	},
+	["plastic_barrel_buoyant"] = {
+		plastic = 0.9,
+		rubber = 0.1
+	},
+	["plastic_box"] = {
+		plastic = 1
+	},
+	["plastic"] = {
+		plastic = 1
+	},
+	["rubber"] = {
+		rubber = 1
+	},
+	["rubbertire"] = {
+		rubber = 1
+	},
+	["slidingrubbertire"] = {
+		rubber = 1
+	},
+	["slidingrubbertire_front"] = {
+		rubber = 1
+	},
+	["slidingrubbertire_rear"] = {
+		rubber = 1
+	},
+	["jeeptire"] = {
+		rubber = 1
+	},
+	["brakingrubbertire"] = {
+		rubber = 1
+	},
+	
+	["carpet"] = {
+		organic = 0.8,
+		rubber = 0.2
+	},
+	["ceiling_tile"] = {
+		rubber = 0.2,
+		plastic = 0.8
+	},
+	["computer"] = {
+		metal = 0.5,
+		plastic = 0.5,
+	},
+	["pottery"] = {
+		stone = 0.7,
+		organic = 0.3,
+	},
+}

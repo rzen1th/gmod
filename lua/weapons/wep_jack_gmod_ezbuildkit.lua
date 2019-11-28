@@ -463,6 +463,66 @@ function SWEP:SecondaryAttack()
 					self:Msg("double click to salvage")
 				end
 				self.LastSalvageAttempt=Time
+				
+			elseif IsValid(Ent) and (Ent:GetClass() == "prop_physics" or Ent:GetClass() == "prop_ragdoll")
+					and (!CPPI or Ent:CPPIGetOwner() == self.Owner) 
+					and IsValid(Ent:GetPhysicsObject()) then
+				
+				local matTbl = JMod_PhysMatMap[Ent:GetPhysicsObject():GetMaterial()] or JMod_PhysMatMap["default"]
+				local mass = Ent:GetPhysicsObject():GetMass()
+				
+				if constraint.HasConstraints(Ent) then
+					self:Msg("Cannot salvage constrained object!")
+					return
+				end
+				
+				if mass > 1000 then
+					self:Msg("Too heavy to salvage! (>1000)")
+					return
+				end
+				
+				-- TODO this is where we check if stuff is fleshy or clothy (organic)
+				
+				for matType, ratio in pairs(matTbl) do
+				
+					local effectiveMass = math.Round(mass * ratio)
+					local diffMass = effectiveMass % 10
+					local largeCount = math.floor((effectiveMass / 10) / 8)
+					local smallCount = (effectiveMass / 10) % 8
+				
+					if diffMass > 0 then
+						local cube = ents.Create("ent_jack_gmod_ezmatcube")
+						cube.Large = false
+						cube.MaterialType = matType
+						cube:SetPos(Ent:GetPos())	
+						cube:SetAngles(AngleRand())
+						cube:Spawn()
+						cube:Activate()
+						timer.Simple(0.1, function()
+							if IsValid(cube) and IsValid(cube:GetPhysicsObject()) then 
+								cube:GetPhysicsObject():SetMass(diffMass) 
+								cube:SetModelScale(0.5 + diffMass/10)
+							end
+						end)
+					end
+					
+					local pos = Ent:GetPos()
+					for i = 1, largeCount + smallCount do
+						timer.Simple(i * 0.05 - 0.05, function()
+							local cube = ents.Create("ent_jack_gmod_ezmatcube")
+							cube.Large = (i > smallCount)
+							cube.MaterialType = matType
+							cube:SetPos(pos + Vector(0, 0, 20) + VectorRand() * 10)
+							cube:SetAngles(AngleRand())
+							cube:Spawn()
+							cube:Activate()
+						end)
+					end
+					
+					Ent:Remove()
+					
+				end
+				
 			end
 		end
 	end
