@@ -478,7 +478,6 @@ function SWEP:SalvageProp(Ent)
 			for i = 1, max do
 				print(effectiveMass, max+1-i, effectiveMass-JMod_MaterialSizes[max+1-i][2])
 				if JMod_MaterialSizes[max+1-i][2] <= effectiveMass then
-					print("good")
 					local c = count
 					timer.Simple(c * 0.05, function()
 						local cube = ents.Create("ent_jack_gmod_ezmatcube")
@@ -505,7 +504,7 @@ function SWEP:SalvageProp(Ent)
 		
 	end
 	
-	self:SetNextSecondaryFire(CurTime() + 2)
+	self:SetNextSecondaryFire(CurTime() + 1)
 	sound.Play("snds_jack_gmod/ez_tools/hit.wav",self:GetPos(),60,math.random(80,120))
 	sound.Play("snds_jack_gmod/ez_tools/"..math.random(1,27)..".wav",self:GetPos(),60,math.random(80,120))
 
@@ -566,7 +565,7 @@ function SWEP:SecondaryAttack()
 					Ent.SalvageProgress = (Ent.SalvageProgress or 0) + 50
 					self.Owner:PrintMessage(HUD_PRINTCENTER, "salvage: " .. math.min(mass, Ent.SalvageProgress) .. "/" .. mass)
 					sound.Play("snds_jack_gmod/ez_tools/hit.wav",self:GetPos(),60,math.random(80,120))
-					self:SetNextSecondaryFire(CurTime() + 0.25)
+					self:SetNextSecondaryFire(CurTime() + 0.5)
 					
 					self:Pawnch()
 					local eff=EffectData()
