@@ -231,21 +231,31 @@ end
 function SWEP:OnRemove()
 end
 
-function SWEP:CountResourcesInRange()
+function SWEP:CanSee(ent)
+	if(ent:GetNoDraw())then return end
+	return not util.TraceLine({
+		start=self:GetPos(),
+		endpos=ent:GetPos(),
+		filter={self,self.Owner,ent},
+		mask=MASK_SOLID_BRUSHONLY
+	}).Hit
+end
+
+function SWEP:CountMaterialInRange()
 	local Results={}
 	for k,obj in pairs(ents.FindInSphere(self:GetPos(),150))do
-		if((obj.IsJackyEZresource)and(self:CanSee(obj)))then
-			local Typ=obj.EZsupplies
-			Results[Typ]=(Results[Typ] or 0)+obj:GetResource()
+		if((obj:GetClass() == "ent_jack_gmod_ezmatcube")and(self:CanSee(obj)))then
+			local Typ=obj.MaterialType
+			Results[Typ]=(Results[Typ] or 0)+obj:GetPhysicsObject():GetMass()
 		end
 	end
 	return Results
 end
 
-function SWEP:HaveResourcesToPerformTask(requirements)
-	local RequirementsMet,ResourcesInRange=true,self:CountResourcesInRange()
+function SWEP:HaveMaterialToPerformTask(requirements)
+	local RequirementsMet,MaterialInRange=true,self:CountMaterialInRange()
 	for typ,amt in pairs(requirements)do
-		if(not((ResourcesInRange[typ])and(ResourcesInRange[typ]>=amt)))then
+		if(not((MaterialInRange[typ])and(MaterialInRange[typ]>=amt)))then
 			RequirementsMet=false
 			break
 		end
@@ -253,25 +263,25 @@ function SWEP:HaveResourcesToPerformTask(requirements)
 	return RequirementsMet
 end
 
-function SWEP:ConsumeResourcesInRange(requirements)
+function SWEP:ConsumeMaterialInRange(requirements)
 	local AllDone,Attempts,RequirementsRemaining=false,0,table.FullCopy(requirements)
 	while not((AllDone)or(Attempts>1000))do
 		local TypesNeeded=table.GetKeys(RequirementsRemaining)
 		if((TypesNeeded)and(#TypesNeeded>0))then
-			local ResourceTypeToLookFor=TypesNeeded[1]
-			local AmountWeNeed=RequirementsRemaining[ResourceTypeToLookFor]
-			local Donor=self:FindResourceContainer(ResourceTypeToLookFor,1) -- every little bit helps
+			local MatTypeToLookFor=TypesNeeded[1]
+			local AmountWeNeed=RequirementsRemaining[MatTypeToLookFor]
+			local Donor=self:FindMaterialCube(MatTypeToLookFor,1) -- every little bit helps
 			if(Donor)then
-				local AmountWeCanTake=Donor:GetResource()
+				local AmountWeCanTake=Donor:GetPhysicsObject():GetMass()
 				if(AmountWeNeed>=AmountWeCanTake)then
-					Donor:SetResource(0)
+					Donor.Used = true
 					Donor:Remove()
-					RequirementsRemaining[ResourceTypeToLookFor]=RequirementsRemaining[ResourceTypeToLookFor]-AmountWeCanTake
+					RequirementsRemaining[MatTypeToLookFor]=RequirementsRemaining[MatTypeToLookFor]-AmountWeCanTake
 				else
-					Donor:SetResource(AmountWeCanTake-AmountWeNeed)
-					RequirementsRemaining[ResourceTypeToLookFor]=RequirementsRemaining[ResourceTypeToLookFor]-AmountWeNeed
+					Donor:GetPhysicsObject():SetMass(AmountWeCanTake-AmountWeNeed) -- TODO break it apart!
+					RequirementsRemaining[MatTypeToLookFor]=RequirementsRemaining[MatTypeToLookFor]-AmountWeNeed
 				end
-				if(RequirementsRemaining[ResourceTypeToLookFor]<=0)then RequirementsRemaining[ResourceTypeToLookFor]=nil end
+				if(RequirementsRemaining[MatTypeToLookFor]<=0)then RequirementsRemaining[MatTypeToLookFor]=nil end
 			end
 		else
 			AllDone=true
@@ -280,9 +290,9 @@ function SWEP:ConsumeResourcesInRange(requirements)
 	end
 end
 
-function SWEP:FindResourceContainer(typ,amt)
+function SWEP:FindMaterialCube(typ,amt)
 	for k,obj in pairs(ents.FindInSphere(self:GetPos(),150))do
-		if((obj.IsJackyEZresource)and(obj.EZsupplies==typ)and(obj:GetResource()>=amt)and(self:CanSee(obj)))then
+		if((obj:GetClass() == "ent_jack_gmod_ezmatcube")and(obj.MaterialType==typ)and(obj:GetPhysicsObject():GetMass()>=amt)and(self:CanSee(obj)))then
 			return obj
 		end
 	end
@@ -325,14 +335,22 @@ end
 
 function SWEP:PrimaryAttack()
 	if self:GetSelectedBuild() > 0 and IsValid(self.Owner.fortkitGhost) and self.Owner:GetEyeTrace().HitPos:Distance(self.Owner:GetPos()) < 200 then
-	
+		
+		local tbl = JMod_Fortifications[self:GetSelectedBuild()]
+		
 		-- TODO check and consume resources
+		if !self:HaveMaterialToPerformTask(tbl.cost) then
+			self.Owner:PrintMessage(HUD_PRINTCENTER, "Cannot afford - stand near more material")
+			self:SetNextPrimaryFire(CurTime() + 1)
+			return
+		end
+		self:ConsumeMaterialInRange(tbl.cost)
 	
 		local tr = self.Owner:GetEyeTrace()
 		local fort = ents.Create("prop_physics")
-		fort:SetModel(JMod_Fortifications[self:GetSelectedBuild()].model)
-		fort:SetAngles(Angle(0, self.Owner:EyeAngles().y, 0) + (JMod_Fortifications[self:GetSelectedBuild()].ang or Angle(0,0,0)))
-		fort:SetPos(self.Owner:GetEyeTrace().HitPos - self.Owner:GetEyeTrace().HitNormal * self.Owner.fortkitGhost:OBBMins().z + (JMod_Fortifications[self:GetSelectedBuild()].pos or Vector(0,0,0)))
+		fort:SetModel(tbl.model)
+		fort:SetAngles(Angle(0, self.Owner:EyeAngles().y, 0) + (tbl.ang or Angle(0,0,0)))
+		fort:SetPos(self.Owner:GetEyeTrace().HitPos - self.Owner:GetEyeTrace().HitNormal * self.Owner.fortkitGhost:OBBMins().z + (tbl.pos or Vector(0,0,0)))
 		fort.EZnosalvage = true
 		fort.EZfortOwner = self.Owner
 		fort:Spawn()
@@ -340,10 +358,10 @@ function SWEP:PrimaryAttack()
 		
 		local phys = fort:GetPhysicsObject()
 		if phys:IsValid() then
-			phys:SetMass(JMod_Fortifications[self:GetSelectedBuild()].mass)
-			if JMod_Fortifications[self:GetSelectedBuild()].fixed then
+			phys:SetMass(tbl.mass)
+			if tbl.fixed then
 				phys:EnableMotion(false)
-				--constraint.Weld(fort,game.GetWorld(),0,0,JMod_Fortifications[self:GetSelectedBuild()].mass*10,true,false)
+				--constraint.Weld(fort,game.GetWorld(),0,0,tbl.mass*10,true,false)
 			else
 				phys:EnableMotion(false)
 				timer.Simple(3, function() if IsValid(fort) and phys:IsValid() then phys:EnableMotion(true) phys:Wake() end end)
