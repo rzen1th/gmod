@@ -7,6 +7,7 @@ if(SERVER)then
 	util.AddNetworkString("JMod_Hint")
 	util.AddNetworkString("JMod_EZtimeBomb")
 	util.AddNetworkString("JMod_UniCrate")
+	util.AddNetworkString("JMod_EZFortKit")
 	local ArmorDisadvantages={
 		--vests
 		["Ballistic Nylon"]=.99,
