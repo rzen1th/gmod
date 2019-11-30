@@ -550,7 +550,7 @@ function SWEP:SecondaryAttack()
 					and IsValid(Ent:GetPhysicsObject()) then
 				
 				local matTbl = JMod_PhysMatMap[Ent:GetPhysicsObject():GetMaterial()] or JMod_PhysMatMap["default"]
-				local mass = math.ceil(Ent:GetPhysicsObject():GetMass())
+				local mass = math.Round(Ent:GetPhysicsObject():GetMass())
 				
 				if constraint.HasConstraints(Ent) then
 					self:Msg("Cannot salvage constrained object!")
@@ -564,18 +564,20 @@ function SWEP:SecondaryAttack()
 				
 				if mass > 100 then
 					Ent.SalvageProgress = (Ent.SalvageProgress or 0) + 50
-					self.Owner:PrintMessage(HUD_PRINTCENTER, "salvage: " .. Ent.SalvageProgress .. "/" .. mass)
+					self.Owner:PrintMessage(HUD_PRINTCENTER, "salvage: " .. math.min(mass, Ent.SalvageProgress) .. "/" .. mass)
 					sound.Play("snds_jack_gmod/ez_tools/hit.wav",self:GetPos(),60,math.random(80,120))
 					self:SetNextSecondaryFire(CurTime() + 0.25)
-					if Ent.SalvageProgress >= mass then 
-						self:SalvageProp(Ent)
-						return
-					end
+					
 					self:Pawnch()
 					local eff=EffectData()
 					eff:SetOrigin(self.Owner:GetEyeTrace().HitPos)
 					eff:SetScale(math.random()*0.1+0.1)
 					util.Effect("eff_jack_gmod_ezbuildsmoke",eff,true,true)
+					
+					if Ent.SalvageProgress >= mass then 
+						self:SalvageProp(Ent)
+						return
+					end
 					
 					local last = Ent.SalvageProgress
 					timer.Simple(2, function() if Ent.SalvageProgress == last then Ent.SalvageProgress = 0 end end)
