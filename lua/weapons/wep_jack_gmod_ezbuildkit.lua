@@ -563,10 +563,10 @@ function SWEP:SecondaryAttack()
 				end
 				
 				if mass > 100 then
-					Ent.SalvageProgress = (Ent.SalvageProgress or 0) + 30
+					Ent.SalvageProgress = (Ent.SalvageProgress or 0) + 50
 					self.Owner:PrintMessage(HUD_PRINTCENTER, "salvage: " .. Ent.SalvageProgress .. "/" .. mass)
 					sound.Play("snds_jack_gmod/ez_tools/hit.wav",self:GetPos(),60,math.random(80,120))
-					self:SetNextSecondaryFire(CurTime() + 0.3)
+					self:SetNextSecondaryFire(CurTime() + 0.25)
 					if Ent.SalvageProgress >= mass then 
 						self:SalvageProp(Ent)
 						return
@@ -578,7 +578,7 @@ function SWEP:SecondaryAttack()
 					util.Effect("eff_jack_gmod_ezbuildsmoke",eff,true,true)
 					
 					local last = Ent.SalvageProgress
-					timer.Simple(3, function() if Ent.SalvageProgress == last then Ent.SalvageProgress = 0 end end)
+					timer.Simple(2, function() if Ent.SalvageProgress == last then Ent.SalvageProgress = 0 end end)
 				else
 					self:Pawnch()
 					self:SalvageProp(Ent)
