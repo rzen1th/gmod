@@ -438,6 +438,85 @@ function SWEP:WhomIlookinAt()
 	local Tr=util.QuickTrace(self.Owner:GetShootPos(),self.Owner:GetAimVector()*80,{self.Owner})
 	return Tr.Entity,Tr.HitPos,Tr.HitNormal
 end
+
+function SWEP:SalvageProp(Ent)
+
+	local matTbl = JMod_PhysMatMap[Ent:GetPhysicsObject():GetMaterial()] or JMod_PhysMatMap["default"]
+	local mass = Ent:GetPhysicsObject():GetMass()
+	local cube = Ent:GetClass() == "ent_jack_gmod_ezmatcube" and Ent.CubeSize - 1 or nil
+	local fleshy = table.HasValue({"flesh", "zombieflesh", "antlion"},  Ent:GetPhysicsObject():GetMaterial())
+	local pos = Ent:LocalToWorld(Ent:OBBCenter())
+	local ang = Ent:GetAngles()
+	
+	for matType, ratio in pairs(matTbl) do
+		local effectiveMass = math.Round(mass * ratio)
+		if matType == "metal" and !cube then effectiveMass = math.Round(effectiveMass ^ 0.75) end
+		local diffMass = effectiveMass % 10
+	
+		if diffMass > 0 then
+			local cube = ents.Create("ent_jack_gmod_ezmatcube")
+			cube.CubeSize = 1
+			cube.MaterialType = matType
+			cube.Flesh = fleshy
+			cube:SetPos(Ent:LocalToWorld(Ent:OBBCenter())+Vector(0,0,10))	
+			cube:SetAngles(AngleRand())
+			cube:Spawn()
+			cube:Activate()
+			timer.Simple(0.1, function()
+				if IsValid(cube) and IsValid(cube:GetPhysicsObject()) then 
+					cube:GetPhysicsObject():SetMass(diffMass) 
+					cube:SetModelScale(0.5 + diffMass/20)
+				end
+			end)
+		end
+		effectiveMass = effectiveMass - diffMass
+		
+		local count = 0
+		local temp = 0
+		local max = math.min(4, cube or 4)
+		while effectiveMass > 0 and temp < 100 do
+			for i = 1, max do
+				print(effectiveMass, max+1-i, effectiveMass-JMod_MaterialSizes[max+1-i][2])
+				if JMod_MaterialSizes[max+1-i][2] <= effectiveMass then
+					print("good")
+					local c = count
+					timer.Simple(c * 0.05, function()
+						local cube = ents.Create("ent_jack_gmod_ezmatcube")
+						cube.CubeSize = max+1-i
+						cube.MaterialType = matType
+						cube.Flesh = fleshy
+						cube:SetPos(pos 
+								+ (math.sin(c*math.pi) * Vector(20,0,0) * (math.floor(c/4))) 
+								+ (math.cos(c*math.pi) * Vector(0,20,0) * (math.floor(c/4))) 
+								+ Vector(0,0,20) * (math.floor(c/4)))
+						cube:SetAngles(Angle(math.random(-180,180),math.random(-180,180),0))
+						cube:DropToFloor()
+						cube:Spawn()
+						cube:Activate()
+					end)
+					
+					effectiveMass = effectiveMass - JMod_MaterialSizes[max+1-i][2]
+					count = count + 1
+					break
+				end
+			end
+			temp = temp + 1
+		end
+		
+	end
+	
+	self:SetNextSecondaryFire(CurTime() + 2)
+	sound.Play("snds_jack_gmod/ez_tools/hit.wav",self:GetPos(),60,math.random(80,120))
+	sound.Play("snds_jack_gmod/ez_tools/"..math.random(1,27)..".wav",self:GetPos(),60,math.random(80,120))
+
+	local eff=EffectData()
+	eff:SetOrigin(pos+VectorRand())
+	eff:SetScale(0.5)
+	util.Effect("eff_jack_gmod_ezbuildsmoke",eff,true,true)
+	Ent:Remove()
+	
+end
+
 function SWEP:SecondaryAttack()
 	if(self.Owner:KeyDown(IN_SPEED))then return end
 	if(SERVER)then
@@ -471,88 +550,38 @@ function SWEP:SecondaryAttack()
 					and IsValid(Ent:GetPhysicsObject()) then
 				
 				local matTbl = JMod_PhysMatMap[Ent:GetPhysicsObject():GetMaterial()] or JMod_PhysMatMap["default"]
-				local mass = Ent:GetPhysicsObject():GetMass()
-				local cube = Ent:GetClass() == "ent_jack_gmod_ezmatcube" and Ent.CubeSize - 1 or nil
+				local mass = math.ceil(Ent:GetPhysicsObject():GetMass())
 				
 				if constraint.HasConstraints(Ent) then
 					self:Msg("Cannot salvage constrained object!")
 					return
 				end
 				
-				if mass > 1000 then
-					self:Msg("Too heavy to salvage! (>1000)")
+				if mass > 5000 then
+					self:Msg("Too heavy to salvage! (>5000)")
 					return
 				end
 				
-				local fleshy = table.HasValue({"flesh", "zombieflesh", "antlion"},  Ent:GetPhysicsObject():GetMaterial())
-				
-				for matType, ratio in pairs(matTbl) do
-					local effectiveMass = math.Round(mass * ratio)
-					if matType == "metal" and !cube then effectiveMass = math.Round(effectiveMass ^ 0.75) end
-					local diffMass = effectiveMass % 10
-				
-					if diffMass > 0 then
-						local cube = ents.Create("ent_jack_gmod_ezmatcube")
-						cube.CubeSize = 1
-						cube.MaterialType = matType
-						cube.Flesh = fleshy
-						cube:SetPos(Ent:LocalToWorld(Ent:OBBCenter())+Vector(0,0,10))	
-						cube:SetAngles(AngleRand())
-						cube:Spawn()
-						cube:Activate()
-						timer.Simple(0.1, function()
-							if IsValid(cube) and IsValid(cube:GetPhysicsObject()) then 
-								cube:GetPhysicsObject():SetMass(diffMass) 
-								cube:SetModelScale(0.5 + diffMass/20)
-							end
-						end)
-					end
-					effectiveMass = effectiveMass - diffMass
-					
-					local pos = Ent:LocalToWorld(Ent:OBBCenter())
-					local ang = Ent:GetAngles()
-					local count = 0
-					local temp = 0
-					local max = math.min(4, cube or 4)
-					while effectiveMass > 0 and temp < 100 do
-						for i = 1, max do
-							print(effectiveMass, max+1-i, effectiveMass-JMod_MaterialSizes[max+1-i][2])
-							if JMod_MaterialSizes[max+1-i][2] <= effectiveMass then
-								print("good")
-								local c = count
-								timer.Simple(c * 0.05, function()
-									local cube = ents.Create("ent_jack_gmod_ezmatcube")
-									cube.CubeSize = max+1-i
-									cube.MaterialType = matType
-									cube.Flesh = fleshy
-									cube:SetPos(pos 
-											+ (math.sin(c*math.pi) * Vector(20,0,0) * (math.floor(c/4))) 
-											+ (math.cos(c*math.pi) * Vector(0,20,0) * (math.floor(c/4))) 
-											+ Vector(0,0,20) * (math.floor(c/4)))
-									cube:SetAngles(Angle(math.random(-180,180),math.random(-180,180),0))
-									cube:DropToFloor()
-									cube:Spawn()
-									cube:Activate()
-								end)
-								
-								effectiveMass = effectiveMass - JMod_MaterialSizes[max+1-i][2]
-								count = count + 1
-								break
-							end
-						end
-						temp = temp + 1
-					end
-					
-					self:SetNextSecondaryFire(CurTime() + 2)
+				if mass > 100 then
+					Ent.SalvageProgress = (Ent.SalvageProgress or 0) + 30
+					self.Owner:PrintMessage(HUD_PRINTCENTER, "salvage: " .. Ent.SalvageProgress .. "/" .. mass)
 					sound.Play("snds_jack_gmod/ez_tools/hit.wav",self:GetPos(),60,math.random(80,120))
-					sound.Play("snds_jack_gmod/ez_tools/"..math.random(1,27)..".wav",self:GetPos(),60,math.random(80,120))
-					---
+					self:SetNextSecondaryFire(CurTime() + 0.3)
+					if Ent.SalvageProgress >= mass then 
+						self:SalvageProp(Ent)
+						return
+					end
+					self:Pawnch()
 					local eff=EffectData()
-					eff:SetOrigin(pos+VectorRand())
-					eff:SetScale(0.5) -- TODO scale with OBB size
+					eff:SetOrigin(self.Owner:GetEyeTrace().HitPos)
+					eff:SetScale(math.random()*0.1+0.1)
 					util.Effect("eff_jack_gmod_ezbuildsmoke",eff,true,true)
-					Ent:Remove()
 					
+					local last = Ent.SalvageProgress
+					timer.Simple(3, function() if Ent.SalvageProgress == last then Ent.SalvageProgress = 0 end end)
+				else
+					self:Pawnch()
+					self:SalvageProp(Ent)
 				end
 				
 			end
