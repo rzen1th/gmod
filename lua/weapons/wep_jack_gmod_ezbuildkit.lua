@@ -530,6 +530,9 @@ function SWEP:SecondaryAttack()
 			return
 		else
 			local Ent,Pos,Norm=self:WhomIlookinAt()
+			
+			if Ent.EZnosalvage then return end
+			
 			if(Ent.EZsalvage)then
 				local Time=CurTime()
 				if(Time-self.LastSalvageAttempt<.15)then -- safeguard so you don't accidentally #shrek your valuable machines

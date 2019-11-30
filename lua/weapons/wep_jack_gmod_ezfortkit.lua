@@ -49,59 +49,109 @@ JMod_Fortifications = {
 		name = "Sandbag Corner",
 		model = "models/props_fortifications/sandbags_corner1.mdl",
 		ang = Angle(0,180,0),
-		mass = 1000,
+		mass = 100,
 		fixed = true,
-		cost = {parts=30}
+		cost = {organic = 30}
 	},
 	[2] = {
 		name = "Sandbag Corner Tall",
 		model = "models/props_fortifications/sandbags_corner1_tall.mdl",
 		ang = Angle(0,180,0),
-		mass = 1200,
+		mass = 150,
 		fixed = true,
-		cost = {parts=40}
+		cost = {organic = 40}
 	},
 	[3] = {
 		name = "Large Sandbag Corner",
 		model = "models/props_fortifications/sandbags_corner2.mdl",
-		mass = 1000,
+		ang = Angle(0,180,0),
+		mass = 200,
 		fixed = true,
-		cost = {parts=60}
+		cost = {organic = 60}
 	},
 	[4] = {
 		name = "Large Sandbag Corner - Tall",
 		model = "models/props_fortifications/sandbags_corner2_tall.mdl",
-		mass = 1200,
+		ang = Angle(0,180,0),
+		mass = 300,
 		fixed = true,
-		cost = {parts=80}
+		cost = {organic = 80}
 	},
 	[5] = {
 		name = "Short Sandbag Line",
 		model = "models/props_fortifications/sandbags_line1.mdl",
-		mass = 1000,
+		ang = Angle(0,180,0),
+		mass = 100,
 		fixed = true,
-		cost = {parts=50}
+		cost = {organic = 50}
 	},
 	[6] = {
 		name = "Short Sandbag Line - Tall",
-		model = "models/props_fortifications/sandbags_corner2_tall.mdl",
-		mass = 1200,
+		model = "models/props_fortifications/sandbags_line1_tall.mdl",
+		ang = Angle(0,180,0),
+		mass = 150,
 		fixed = true,
-		cost = {parts=60}
+		cost = {organic = 60}
 	},
 	[7] = {
-		name = "Dragon's Teeth - Small",
-		model = "models/props_fortifications/dragonsteeth_small.mdl",
-		mass = 2000,
+		name = "Long Sandbag Line",
+		model = "models/props_fortifications/sandbags_line2.mdl",
+		ang = Angle(0,180,0),
+		mass = 200,
 		fixed = true,
-		cost = {parts=20}
+		cost = {organic = 80}
 	},
 	[8] = {
+		name = "Long Sandbag Line - Tall",
+		model = "models/props_fortifications/sandbags_line2_tall.mdl",
+		ang = Angle(0,180,0),
+		mass = 300,
+		fixed = true,
+		cost = {organic = 100}
+	},
+	[9] = {
+		name = "Dragon's Teeth - Small",
+		model = "models/props_fortifications/dragonsteeth_small.mdl",
+		mass = 300,
+		fixed = true,
+		cost = {stone = 30, metal = 10}
+	},
+	[10] = {
 		name = "Dragon's Teeth - Large",
 		model = "models/props_fortifications/dragonsteeth_large.mdl",
-		mass = 3000,
+		mass = 500,
 		fixed = true,
-		cost = {parts=30}
+		cost = {stone = 50, metal = 10}
+	},
+	[11] = {
+		name = "Concrete Barrier",
+		model = "models/props_c17/concrete_barrier001a.mdl",
+		mass = 400,
+		fixed = true,
+		cost = {stone = 80}
+	},
+	[12] = {
+		name = "Wooden Door Barricade",
+		model = "models/mosi/fallout4/props/fortifications/doorbarricade.mdl",
+		mass = 50,
+		fixed = false,
+		cost = {wood = 40}
+	},
+	[13] = {
+		name = "Junk Wall",
+		model = "models/mosi/fallout4/props/fortifications/junkwall02.mdl",
+		pos = Vector(0, 0, -10),
+		mass = 200,
+		fixed = true,
+		cost = {wood = 50, metal = 50}
+	},
+	[14] = {
+		name = "Junk Doorway",
+		model = "models/mosi/fallout4/props/fortifications/junkwalldoorway.mdl",
+		pos = Vector(0, 0, 	-10),
+		mass = 180,
+		fixed = true,
+		cost = {wood = 30, metal = 40}
 	},
 	
 }
@@ -135,7 +185,7 @@ if SERVER then
 				ply.fortkitGhost = ents.Create("prop_physics")
 				if IsValid(ply.fortkitGhost) then
 					ply.fortkitGhost:SetAngles(Angle(0, ply:EyeAngles().y - 180, 0) + (JMod_Fortifications[wep:GetSelectedBuild()].ang or Angle(0,0,0)))
-					ply.fortkitGhost:SetPos(tr.HitPos - tr.HitNormal * ply.fortkitGhost:OBBMins().z)
+					ply.fortkitGhost:SetPos(tr.HitPos - tr.HitNormal * ply.fortkitGhost:OBBMins().z + (JMod_Fortifications[wep:GetSelectedBuild()].pos or Vector(0,0,0)))
 					ply.fortkitGhost:SetColor(Color(46, 204, 113, 150))
 					ply.fortkitGhost:SetModel(JMod_Fortifications[wep:GetSelectedBuild()].model)
 					ply.fortkitGhost:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
@@ -148,9 +198,9 @@ if SERVER then
 				if ply.fortkitGhost:GetModel() != JMod_Fortifications[wep:GetSelectedBuild()].model then
 					ply.fortkitGhost:SetModel(JMod_Fortifications[wep:GetSelectedBuild()].model)
 				end
-				ply.fortkitGhost:SetPos(tr.HitPos - tr.HitNormal * ply.fortkitGhost:OBBMins().z)
+				ply.fortkitGhost:SetPos(tr.HitPos - tr.HitNormal * ply.fortkitGhost:OBBMins().z + (JMod_Fortifications[wep:GetSelectedBuild()].pos or Vector(0,0,0)))
 				ply.fortkitGhost:SetAngles(Angle(0, ply:EyeAngles().y, 0) + (JMod_Fortifications[wep:GetSelectedBuild()].ang or Angle(0,0,0)))
-				if tr.HitPos:Distance(ply:GetPos()) >= 150 then
+				if tr.HitPos:Distance(ply:GetPos()) >= 200 then
 					ply.fortkitGhost:SetColor(Color(255, 255, 255, 0))
 				elseif ply.fortkitGhost:GetColor().a == 0 then
 					ply.fortkitGhost:SetColor(Color(45, 200, 110, 150))
@@ -274,7 +324,7 @@ function SWEP:SwitchSelectedBuild(num)
 end
 
 function SWEP:PrimaryAttack()
-	if self:GetSelectedBuild() > 0 and IsValid(self.Owner.fortkitGhost) then
+	if self:GetSelectedBuild() > 0 and IsValid(self.Owner.fortkitGhost) and self.Owner:GetEyeTrace().HitPos:Distance(self.Owner:GetPos()) < 200 then
 	
 		-- TODO check and consume resources
 	
@@ -282,13 +332,21 @@ function SWEP:PrimaryAttack()
 		local fort = ents.Create("prop_physics")
 		fort:SetModel(JMod_Fortifications[self:GetSelectedBuild()].model)
 		fort:SetAngles(Angle(0, self.Owner:EyeAngles().y, 0) + (JMod_Fortifications[self:GetSelectedBuild()].ang or Angle(0,0,0)))
-		fort:SetPos(self.Owner:GetEyeTrace().HitPos - self.Owner:GetEyeTrace().HitNormal * self.Owner.fortkitGhost:OBBMins().z)
+		fort:SetPos(self.Owner:GetEyeTrace().HitPos - self.Owner:GetEyeTrace().HitNormal * self.Owner.fortkitGhost:OBBMins().z + (JMod_Fortifications[self:GetSelectedBuild()].pos or Vector(0,0,0)))
+		fort.EZnosalvage = true
+		fort.EZfortOwner = self.Owner
 		fort:Spawn()
+		fort:DropToFloor()
 		
-		if fort:GetPhysicsObject():IsValid() then
-			fort:GetPhysicsObject():SetMass(JMod_Fortifications[self:GetSelectedBuild()].mass)
+		local phys = fort:GetPhysicsObject()
+		if phys:IsValid() then
+			phys:SetMass(JMod_Fortifications[self:GetSelectedBuild()].mass)
 			if JMod_Fortifications[self:GetSelectedBuild()].fixed then
-				constraint.Weld(fort,game.GetWorld(),0,0,JMod_Fortifications[self:GetSelectedBuild()].mass*10,false,false)
+				phys:EnableMotion(false)
+				--constraint.Weld(fort,game.GetWorld(),0,0,JMod_Fortifications[self:GetSelectedBuild()].mass*10,true,false)
+			else
+				phys:EnableMotion(false)
+				timer.Simple(3, function() if IsValid(fort) and phys:IsValid() then phys:EnableMotion(true) phys:Wake() end end)
 			end
 		end
 		
@@ -301,7 +359,11 @@ function SWEP:PrimaryAttack()
 end
 
 function SWEP:SecondaryAttack()
-
+	local fort = self.Owner:GetEyeTrace().Entity
+	if IsValid(fort) and fort.EZfortOwner == self.Owner then
+		fort:Remove()
+		self:SetNextSecondaryFire(CurTime() + 1)
+	end
 end
 
 function SWEP:Reload()
