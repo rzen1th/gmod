@@ -1856,6 +1856,64 @@ if(SERVER)then
 			if(table.HasValue(TriggerKeys,key))then hook.Remove("KeyPress",HookName) end
 		end)
 	end
+	
+	function JMod_GenerateMaterial(pos, matType, mass)
+	
+		local leftMass = mass % 10
+	
+		if leftMass > 0 then
+			local cube = ents.Create("ent_jack_gmod_ezmatcube")
+			cube.CubeSize = 1
+			cube.MaterialType = matType
+			cube.Flesh = fleshy
+			cube:SetPos(Ent:LocalToWorld(Ent:OBBCenter())+Vector(0,0,10))	
+			cube:SetAngles(AngleRand())
+			cube:Spawn()
+			cube:Activate()
+			timer.Simple(0.1, function()
+				if IsValid(cube) and IsValid(cube:GetPhysicsObject()) then 
+					cube:GetPhysicsObject():SetMass(leftMass) 
+					cube:SetModelScale(0.5 + leftMass/20)
+				end
+			end)
+		end
+		mass = mass - leftMass
+		
+		local count = 0
+		local temp = 0
+		local max = 4
+		while mass > 0 and temp < 100 do
+			for i = 1, max do
+				--print(mass, max+1-i, mass-JMod_MaterialSizes[max+1-i][2])
+				if JMod_MaterialSizes[max+1-i][2] <= mass then
+					local c = count
+					timer.Simple(c * 0.05, function()
+						print("making cube of size " .. max+1-i .. "")
+						local cube = ents.Create("ent_jack_gmod_ezmatcube")
+						cube.CubeSize = max+1-i
+						cube.MaterialType = matType
+						cube.Flesh = fleshy
+						cube:SetPos(pos 
+								+ (math.sin(c*math.pi) * Vector(20,0,0) * (math.floor(c/4))) 
+								+ (math.cos(c*math.pi) * Vector(0,20,0) * (math.floor(c/4))) 
+								+ Vector(0,0,20) * (math.floor(c/4)))
+						cube:SetAngles(Angle(math.random(-180,180),math.random(-180,180),0))
+						cube:DropToFloor()
+						cube:Spawn()
+						cube:Activate()
+					end)
+					
+					mass = mass - JMod_MaterialSizes[max+1-i][2]
+					count = count + 1
+					break
+				end
+			end
+			temp = temp + 1
+		end
+	
+	
+	end
+	
 	net.Receive("JMod_EZbuildKit",function(ln,ply)
 		local Num,Wep=net.ReadInt(8),ply:GetWeapon("wep_jack_gmod_ezbuildkit")
 		if(IsValid(Wep))then

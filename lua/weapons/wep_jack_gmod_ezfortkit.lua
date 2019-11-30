@@ -131,13 +131,20 @@ JMod_Fortifications = {
 		cost = {stone = 80}
 	},
 	[12] = {
+		name = "Double Blast Door",
+		model = "models/props_lab/blastdoor001c.mdl",
+		mass = 200,
+		fixed = false,
+		cost = {metal = 50}
+	},
+	[13] = {
 		name = "Wooden Door Barricade",
 		model = "models/mosi/fallout4/props/fortifications/doorbarricade.mdl",
 		mass = 50,
 		fixed = false,
 		cost = {wood = 40}
 	},
-	[13] = {
+	[14] = {
 		name = "Junk Wall",
 		model = "models/mosi/fallout4/props/fortifications/junkwall02.mdl",
 		pos = Vector(0, 0, -10),
@@ -145,7 +152,7 @@ JMod_Fortifications = {
 		fixed = true,
 		cost = {wood = 50, metal = 50}
 	},
-	[14] = {
+	[15] = {
 		name = "Junk Doorway",
 		model = "models/mosi/fallout4/props/fortifications/junkwalldoorway.mdl",
 		pos = Vector(0, 0, 	-10),
@@ -274,11 +281,13 @@ function SWEP:ConsumeMaterialInRange(requirements)
 			if(Donor)then
 				local AmountWeCanTake=Donor:GetPhysicsObject():GetMass()
 				if(AmountWeNeed>=AmountWeCanTake)then
-					Donor.Used = true
 					Donor:Remove()
 					RequirementsRemaining[MatTypeToLookFor]=RequirementsRemaining[MatTypeToLookFor]-AmountWeCanTake
 				else
-					Donor:GetPhysicsObject():SetMass(AmountWeCanTake-AmountWeNeed) -- TODO break it apart!
+					--Donor:GetPhysicsObject():SetMass(AmountWeCanTake-AmountWeNeed)
+					local donorPos = Donor:GetPos()
+					Donor:Remove()
+					JMod_GenerateMaterial(donorPos, MatTypeToLookFor, AmountWeCanTake-AmountWeNeed)
 					RequirementsRemaining[MatTypeToLookFor]=RequirementsRemaining[MatTypeToLookFor]-AmountWeNeed
 				end
 				if(RequirementsRemaining[MatTypeToLookFor]<=0)then RequirementsRemaining[MatTypeToLookFor]=nil end
