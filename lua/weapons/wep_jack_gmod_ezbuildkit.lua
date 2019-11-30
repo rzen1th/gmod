@@ -464,12 +464,15 @@ function SWEP:SecondaryAttack()
 				end
 				self.LastSalvageAttempt=Time
 				
-			elseif IsValid(Ent) and (table.HasValue({"prop_physics", "prop_physics_multiplayer", "prop_ragdoll"}, Ent:GetClass()))
+			elseif IsValid(Ent) and 
+					(table.HasValue({"prop_physics", "prop_physics_multiplayer", "prop_ragdoll"}, Ent:GetClass())
+					or Ent:GetClass() == "ent_jack_gmod_ezmatcube" and Ent.CubeSize > 1)
 					and (!CPPI or Ent:CPPIGetOwner() == self.Owner) 
 					and IsValid(Ent:GetPhysicsObject()) then
 				
 				local matTbl = JMod_PhysMatMap[Ent:GetPhysicsObject():GetMaterial()] or JMod_PhysMatMap["default"]
 				local mass = Ent:GetPhysicsObject():GetMass()
+				local cube = Ent:GetClass() == "ent_jack_gmod_ezmatcube" and Ent.CubeSize - 1 or nil
 				
 				if constraint.HasConstraints(Ent) then
 					self:Msg("Cannot salvage constrained object!")
@@ -484,19 +487,16 @@ function SWEP:SecondaryAttack()
 				local fleshy = table.HasValue({"flesh", "zombieflesh", "antlion"},  Ent:GetPhysicsObject():GetMaterial())
 				
 				for matType, ratio in pairs(matTbl) do
-				
 					local effectiveMass = math.Round(mass * ratio)
-					if matType == "metal" then effectiveMass = math.Round(effectiveMass ^ 0.75) end
+					if matType == "metal" and !cube then effectiveMass = math.Round(effectiveMass ^ 0.75) end
 					local diffMass = effectiveMass % 10
-					local largeCount = math.floor((effectiveMass / 10) / 8)
-					local smallCount = (effectiveMass / 10) % 8
 				
 					if diffMass > 0 then
 						local cube = ents.Create("ent_jack_gmod_ezmatcube")
-						cube.Large = false
+						cube.CubeSize = 1
 						cube.MaterialType = matType
 						cube.Flesh = fleshy
-						cube:SetPos(Ent:GetPos())	
+						cube:SetPos(Ent:LocalToWorld(Ent:OBBCenter())+Vector(0,0,10))	
 						cube:SetAngles(AngleRand())
 						cube:Spawn()
 						cube:Activate()
@@ -507,20 +507,42 @@ function SWEP:SecondaryAttack()
 							end
 						end)
 					end
+					effectiveMass = effectiveMass - diffMass
 					
-					local pos = Ent:GetPos()
-					for i = 1, largeCount + smallCount do
-						timer.Simple(i * 0.05 - 0.05, function()
-							local cube = ents.Create("ent_jack_gmod_ezmatcube")
-							cube.Large = (i > smallCount)
-							cube.MaterialType = matType
-							cube.Flesh = fleshy
-							cube:SetPos(pos + Vector(0, 0, 20) + VectorRand() * 10) -- TODO don't spray
-							cube:SetAngles(AngleRand())
-							cube:Spawn()
-							cube:Activate()
-						end)
+					local pos = Ent:LocalToWorld(Ent:OBBCenter())
+					local ang = Ent:GetAngles()
+					local count = 0
+					local temp = 0
+					local max = math.min(4, cube or 4)
+					while effectiveMass > 0 and temp < 100 do
+						for i = 1, max do
+							print(effectiveMass, max+1-i, effectiveMass-JMod_MaterialSizes[max+1-i][2])
+							if JMod_MaterialSizes[max+1-i][2] <= effectiveMass then
+								print("good")
+								local c = count
+								timer.Simple(c * 0.05, function()
+									local cube = ents.Create("ent_jack_gmod_ezmatcube")
+									cube.CubeSize = max+1-i
+									cube.MaterialType = matType
+									cube.Flesh = fleshy
+									cube:SetPos(pos 
+											+ (math.sin(c*math.pi) * Vector(20,0,0) * (math.floor(c/4))) 
+											+ (math.cos(c*math.pi) * Vector(0,20,0) * (math.floor(c/4))) 
+											+ Vector(0,0,20) * (math.floor(c/4)))
+									cube:SetAngles(Angle(math.random(-180,180),math.random(-180,180),0))
+									cube:DropToFloor()
+									cube:Spawn()
+									cube:Activate()
+								end)
+								
+								effectiveMass = effectiveMass - JMod_MaterialSizes[max+1-i][2]
+								count = count + 1
+								break
+							end
+						end
+						temp = temp + 1
 					end
+					
 					self:SetNextSecondaryFire(CurTime() + 2)
 					sound.Play("snds_jack_gmod/ez_tools/hit.wav",self:GetPos(),60,math.random(80,120))
 					sound.Play("snds_jack_gmod/ez_tools/"..math.random(1,27)..".wav",self:GetPos(),60,math.random(80,120))

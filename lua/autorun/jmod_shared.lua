@@ -1346,9 +1346,16 @@ JMod_EZnutrientsCrateSize=15
 -- frickin like ADD npc factions to the whitelist yo, gosh damn
 -- add the crate smoke flare
 
+JMod_MaterialSizes = {
+	[1] = {"models/hunter/blocks/cube025x025x025.mdl", 10},
+	[2] = {"models/hunter/blocks/cube05x05x05.mdl", 80},
+	[3] = {"models/hunter/blocks/cube075x075x075.mdl", 270},
+	[4] = {"models/hunter/blocks/cube1x1x1.mdl", 640}
+}
+
 JMod_MaterialTypes = {
 	["metal"] = {
-		Material = {"phoenix_storms/MetalSet_1-2", "models/props_pipes/GutterMetal01a", "phoenix_storms/dome", "phoenix_storms/cube", "models/props_debris/metalwall001a", "models/props_pipes/Pipesystem01a_skin3", "models/props_pipes/GutterMetal01a"}, 
+		Material = {"phoenix_storms/MetalSet_1-2", "models/props_pipes/GutterMetal01a", "phoenix_storms/dome", "models/props_junk/i-beam_cluster01", "models/props_debris/metalwall001a", "models/props_pipes/Pipesystem01a_skin3", "models/props_pipes/GutterMetal01a"}, 
 		PhysMaterial = "metal", 
 		ColSound = "Canister.ImpactHard"
 	},

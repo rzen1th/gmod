@@ -7,6 +7,7 @@ ENT.Spawnable=false
 
 ENT.MaterialType = ""
 ENT.Large = false
+ENT.CubeSize = 1
 
 if SERVER then
 
@@ -23,16 +24,17 @@ if SERVER then
 	
 	function ENT:Initialize()
 	
-		self:SetModel(self.Large and "models/hunter/blocks/cube05x05x05.mdl" or "models/hunter/blocks/cube025x025x025.mdl")
+		self:SetModel(JMod_MaterialSizes[self.CubeSize][1] or "models/hunter/blocks/cube025x025x025.mdl")
 		self:PhysicsInit(SOLID_VPHYSICS)
-		self:SetMoveType(MOVETYPE_VPHYSICS)	
+		--self:SetMoveType(MOVETYPE_FLY)
+		self:SetMoveType(MOVETYPE_VPHYSICS)
 		self:SetSolid(SOLID_VPHYSICS)
 		self:DrawShadow(true)
 		self:SetUseType(SIMPLE_USE)
 
 		self.NextLoad=0
 		self.Loaded=false
-		self.DamageThreshold = (self.Large and 120) or 50
+		self.DamageThreshold = 100
 		
 		if JMod_MaterialTypes[self.MaterialType] then 
 			if self.MaterialType == "organic" and self.Flesh then
@@ -46,8 +48,8 @@ if SERVER then
 			end
 		end
 
-		self:GetPhysicsObject():SetMass(self.Large and 80 or 10)
-		self:GetPhysicsObject():Wake()
+		self:GetPhysicsObject():SetMass(JMod_MaterialSizes[self.CubeSize][2] or 10)
+		--self:GetPhysicsObject():Wake()
 	end
 	
 	function ENT:Use(activator)
