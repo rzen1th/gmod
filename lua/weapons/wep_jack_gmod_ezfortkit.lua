@@ -316,10 +316,13 @@ function SWEP:DrawWorldModel()
 	self:SCKDrawWorldModel()
 end
 
-function SWEP:DoAnimation()
+function SWEP:DoAnimation(hit)
 	self.Owner:SetAnimation( PLAYER_ATTACK1 )
 	local vm=self.Owner:GetViewModel()
-	vm:SendViewModelMatchingSequence( vm:LookupSequence( "misscenter" .. math.random(1,2) ) )
+	local seq = hit and "hitcenter" .. math.random(1,2) or "misscenter" .. math.random(1,2)
+	vm:SendViewModelMatchingSequence( vm:LookupSequence( seq ) )
+	if !hit then self:EmitSound("weapons/iceaxe/iceaxe_swing1.wav", 50, math.random(90,100)) 
+	else self:EmitSound("physics/metal/metal_canister_impact_hard" .. math.random(1,3) .. ".wav", 60, math.random(90,110)) end
 	self:UpdateNextIdle()
 end
 
@@ -343,7 +346,47 @@ function SWEP:SwitchSelectedBuild(num)
 end
 
 function SWEP:PrimaryAttack()
-	if self:GetSelectedBuild() > 0 and IsValid(self.Owner.fortkitGhost) and self.Owner:GetEyeTrace().HitPos:Distance(self.Owner:GetPos()) < 200 then
+
+	local tr = self.Owner:GetEyeTrace()
+	local ghostTr = util.TraceLine({
+		start = self.Owner:EyePos(),
+		endpos = self.Owner:EyePos() + tr.Normal * 150,
+		filter = {self.Owner, self},
+		mask = MASK_ALL
+	})
+
+	print(ghostTr.Entity)
+	
+	if IsValid(ghostTr.Entity) and ghostTr.Entity.Progress and ghostTr.Entity.EZfortOwner then
+
+		local fort = ghostTr.Entity
+		local mass = fort:GetPhysicsObject():IsValid() and fort:GetPhysicsObject():GetMass() or 100
+		
+		fort.Progress = math.min(fort.Progress + 25, mass)
+		self.Owner:PrintMessage(HUD_PRINTCENTER, "fortification: " .. fort.Progress .. "/" .. mass)
+		
+		if fort.Progress >= mass then
+			fort.Progress = nil
+			fort:SetColor(Color(255,255,255,255))
+			fort:SetCollisionGroup(COLLISION_GROUP_NONE)
+			fort:SetRenderMode(RENDERMODE_NORMAL)
+			
+			local eff=EffectData()
+			eff:SetOrigin(fort:LocalToWorld(fort:OBBCenter()))
+			eff:SetScale(1)
+			util.Effect("eff_jack_gmod_ezbuildsmoke",eff,true,true)
+			
+		end
+	
+		local eff=EffectData()
+		eff:SetOrigin(ghostTr.HitPos)
+		eff:SetScale(math.random()*0.1+0.1)
+		util.Effect("eff_jack_gmod_ezbuildsmoke",eff,true,true)
+	
+		self:DoAnimation(true)
+		self:SetNextPrimaryFire(CurTime() + 0.5)
+	
+	elseif self:GetSelectedBuild() > 0 and IsValid(self.Owner.fortkitGhost) and tr.HitPos:Distance(self.Owner:GetPos()) < 200 then
 		
 		local tbl = JMod_Fortifications[self:GetSelectedBuild()]
 		
@@ -355,15 +398,21 @@ function SWEP:PrimaryAttack()
 		end
 		self:ConsumeMaterialInRange(tbl.cost)
 	
-		local tr = self.Owner:GetEyeTrace()
+		local pos = tr.HitPos - tr.HitNormal * self.Owner.fortkitGhost:OBBMins().z + (tbl.pos or Vector(0,0,0))
+		
 		local fort = ents.Create("prop_physics")
 		fort:SetModel(tbl.model)
 		fort:SetAngles(Angle(0, self.Owner:EyeAngles().y, 0) + (tbl.ang or Angle(0,0,0)))
-		fort:SetPos(self.Owner:GetEyeTrace().HitPos - self.Owner:GetEyeTrace().HitNormal * self.Owner.fortkitGhost:OBBMins().z + (tbl.pos or Vector(0,0,0)))
+		fort:SetPos(pos)
 		fort.EZnosalvage = true
 		fort.EZfortOwner = self.Owner
+		fort.Progress = 0
+		fort:SetColor(Color(255,255,255,100))
+		fort:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
+		fort:SetRenderMode(RENDERMODE_TRANSALPHA)
 		fort:Spawn()
 		fort:DropToFloor()
+		timer.Simple(60, function() if fort.Progress then SafeRemoveEntity(fort) end end)
 		
 		local phys = fort:GetPhysicsObject()
 		if phys:IsValid() then
@@ -377,8 +426,9 @@ function SWEP:PrimaryAttack()
 			end
 		end
 		
+		self:DoAnimation(true)
 		self:SwitchSelectedBuild(0)
-		self:SetNextPrimaryFire(CurTime() + 3)
+		self:SetNextPrimaryFire(CurTime() + 1)
 	else
 		self:DoAnimation()
 		self:SetNextPrimaryFire(CurTime() + 1)
