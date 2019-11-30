@@ -1866,7 +1866,7 @@ if(SERVER)then
 			cube.CubeSize = 1
 			cube.MaterialType = matType
 			cube.Flesh = fleshy
-			cube:SetPos(Ent:LocalToWorld(Ent:OBBCenter())+Vector(0,0,10))	
+			cube:SetPos(pos+Vector(0,0,10))	
 			cube:SetAngles(AngleRand())
 			cube:Spawn()
 			cube:Activate()
