@@ -4,7 +4,7 @@ AddCSLuaFile('cl_init.lua')
 AddCSLuaFile('shared.lua')
 include('shared.lua')
 function ENT:SpawnFunction(ply,tr)
-	local SpawnPos=tr.HitPos + tr.HitNormal*16
+	local SpawnPos=tr.HitPos+tr.HitNormal*16
 	local ent=ents.Create("ent_jack_aidfuel_diesel")
 	ent:SetPos(SpawnPos)
 	ent:SetNetworkedEntity("Owenur",ply)
@@ -22,8 +22,8 @@ function ENT:Initialize()
 	self.Entity:SetMoveType(MOVETYPE_VPHYSICS)	
 	self.Entity:SetSolid(SOLID_VPHYSICS)
 	self.Entity:DrawShadow(true)
-	local phys = self.Entity:GetPhysicsObject()
-	if phys:IsValid() then
+	local phys=self.Entity:GetPhysicsObject()
+	if phys:IsValid()then
 		phys:Wake()
 		phys:SetMass(35)
 	end
@@ -95,13 +95,7 @@ function ENT:Fougassplode()
 			end
 		end
 	end
-	local explode=ents.Create("env_explosion")
-	explode:SetPos(SelfPos)
-	explode:SetOwner(self.Entity)
-	explode:Spawn()
-	explode:Activate()
-	explode:SetKeyValue("iMagnitude","30")
-	explode:Fire("Explode",0,0)
+	JMod_Sploom(self.Entity,SelfPos,30)
 	for i=0,25 do
 		local Tr=util.QuickTrace(SelfPos,VectorRand()*math.Rand(200,300),{self})
 		if(Tr.Hit)then

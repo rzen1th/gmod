@@ -8,6 +8,7 @@ ENT.PrintName="EZ Fumigator"
 ENT.Spawnable=true
 ENT.AdminSpawnable=true
 ---
+ENT.JModEZstorable=true
 ENT.JModPreferredCarryAngles=Angle(0,0,0)
 ---
 local STATE_SEALED,STATE_TICKING,STATE_VENTING=0,1,2
@@ -83,16 +84,15 @@ if(SERVER)then
 			activator:PickupObject(self)
 		end
 	end
+	function ENT:EZdetonateOverride(detonator)
+		self:EmitSound("snd_jack_sminepop.wav",70,120)
+		self:SetState(STATE_VENTING)
+	end
 	function ENT:Burst()
 		if(self.Exploded)then return end
 		self.Exploded=true
 		local SelfPos,Owner,SelfVel=self:LocalToWorld(self:OBBCenter()),self.Owner or self,self:GetPhysicsObject():GetVelocity()
-		local Boom=ents.Create("env_explosion")
-		Boom:SetPos(SelfPos)
-		Boom:SetKeyValue("imagnitude","100")
-		Boom:SetOwner(Owner)
-		Boom:Spawn()
-		Boom:Fire("explode",0,"")
+		JMod_Sploom(Owner,SelfPos,100)
 		for i=1,self.ContainedGas do
 			timer.Simple(i/200,function()
 				local Gas=ents.Create("ent_jack_gmod_ezgasparticle")

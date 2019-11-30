@@ -7,8 +7,8 @@ function ENT:Initialize()
 	self.Entity:SetSolid(SOLID_VPHYSICS)
 	self.Entity:SetCollisionGroup(COLLISION_GROUP_NONE)
 	self.Entity:SetUseType(SIMPLE_USE)
-	local phys = self.Entity:GetPhysicsObject()
-	if phys:IsValid() then
+	local phys=self.Entity:GetPhysicsObject()
+	if phys:IsValid()then
 		phys:Wake()
 		phys:SetMass(7)
 	end
@@ -17,7 +17,7 @@ function ENT:Initialize()
 	self.ExplosiveMul=0.5
 end
 function ENT:PhysicsCollide(data, physobj)
-	if (data.Speed > 80 and data.DeltaTime > 0.2) then
+	if(data.Speed>80 and data.DeltaTime>0.2)then
 		self:Detonate()
 	end
 end
@@ -50,13 +50,7 @@ function ENT:Detonate()
 		util.ScreenShake(SelfPos,99999,99999,1,750)
 		
 		if(self.Type=="HE")then
-			local explode=ents.Create("env_explosion")
-			explode:SetPos(self:GetPos())
-			explode:SetOwner(self:GetOwner() or self:GetNetworkedEntity("Owenur"))
-			explode:Spawn()
-			explode:Activate()
-			explode:SetKeyValue("iMagnitude","190")
-			explode:Fire("Explode",0,0)
+			JMod_Sploom(self:GetOwner() or self:GetNetworkedEntity("Owenur"),self:GetPos(),190)
 		end
 		for i=0,30 do
 			local Trayuss=util.QuickTrace(SelfPos,VectorRand()*200,{self.Entity})

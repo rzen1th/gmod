@@ -25,8 +25,8 @@ function ENT:Initialize()
 	self.Entity:SetSolid(SOLID_VPHYSICS)
 	self.Entity:DrawShadow(true)
 	self.Exploded=false
-	local phys = self.Entity:GetPhysicsObject()
-	if phys:IsValid() then
+	local phys=self.Entity:GetPhysicsObject()
+	if phys:IsValid()then
 		phys:Wake()
 		phys:SetMass(40)
 		phys:SetMaterial("metal")
@@ -49,13 +49,7 @@ function ENT:Detonate(tr)
 	Poo:SetNormal(Dir)
 	util.Effect("eff_jack_directionalsplode",Poo,true,true)
 	for i=0,2 do
-		local explode=ents.Create("env_explosion")
-		explode:SetPos(SelfPos+VectorRand())
-		explode:SetOwner(self.Entity)
-		explode:Spawn()
-		explode:Activate()
-		explode:SetKeyValue("iMagnitude","20")
-		explode:Fire("Explode",0,0)
+		JMod_Sploom(self.Entity,SelfPos+VectorRand(),20)
 	end
 	for i=0,5 do
 		local QT=util.QuickTrace(SelfPos,VectorRand()*50,{self})

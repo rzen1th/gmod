@@ -4,7 +4,7 @@ AddCSLuaFile('cl_init.lua')
 AddCSLuaFile('shared.lua')
 include('shared.lua')
 function ENT:SpawnFunction(ply,tr)
-	local SpawnPos=tr.HitPos + tr.HitNormal*16
+	local SpawnPos=tr.HitPos+tr.HitNormal*16
 	local ent=ents.Create("ent_jack_aidfuel_propane")
 	ent:SetPos(SpawnPos)
 	ent:SetNetworkedEntity("Owenur",ply)
@@ -23,8 +23,8 @@ function ENT:Initialize()
 	self.Entity:SetMoveType(MOVETYPE_VPHYSICS)	
 	self.Entity:SetSolid(SOLID_VPHYSICS)
 	self.Entity:DrawShadow(true)
-	local phys = self.Entity:GetPhysicsObject()
-	if phys:IsValid() then
+	local phys=self.Entity:GetPhysicsObject()
+	if phys:IsValid()then
 		phys:Wake()
 		phys:SetMass(35)
 	end
@@ -49,13 +49,7 @@ function ENT:Asplode()
 	if(self.Asploded)then return end
 	self.Asploded=true
 	local SelfPos=self:LocalToWorld(self:OBBCenter())
-	local explode=ents.Create("env_explosion")
-	explode:SetPos(SelfPos)
-	explode:SetOwner(self.Entity)
-	explode:Spawn()
-	explode:Activate()
-	explode:SetKeyValue("iMagnitude","110")
-	explode:Fire("Explode",0,0)
+	JMod_Sploom(self.Entity,SelfPos,110)
 	self:Remove()
 end
 function ENT:Use(activator,caller)

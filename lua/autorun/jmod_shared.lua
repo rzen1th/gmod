@@ -20,7 +20,7 @@ end
 function JMod_InitGlobalConfig()
 	local NewConfig={
 		Author="Jackarunda",
-		Version=11,
+		Version=12,
 		Note="radio packages must have all lower-case names",
 		Hints=true,
 		SentryPerformanceMult=1,
@@ -35,6 +35,8 @@ function JMod_InitGlobalConfig()
 		MicroBlackHoleGravityStrength=1,
 		BuildKitDeWeldSpeed=1,
 		HandGrabStrength=1,
+		BombDisarmSpeed=1,
+		ExplosionPropDestroyPower=1,
 		FoodSpecs={
 			DigestSpeed=1,
 			ConversionEfficiency=1,
@@ -119,7 +121,28 @@ function JMod_InitGlobalConfig()
 				},
 				["antimatter"]={
 					"ent_jack_gmod_ezantimatter"
-				}
+				},
+				["grenades"]={
+					{"ent_jack_gmod_eznade_impact",2},
+					{"ent_jack_gmod_eznade_proximity",2},
+					{"ent_jack_gmod_eznade_remote",2},
+					{"ent_jack_gmod_eznade_timed",2},
+				},
+				["impact grenades"]={
+					{"ent_jack_gmod_eznade_impact",8}
+				},
+				["proximity grenades"]={
+					{"ent_jack_gmod_eznade_proximity",8}
+				},
+				["remote grenades"]={
+					{"ent_jack_gmod_eznade_remote",8}
+				},
+				["timed grenades"]={
+					{"ent_jack_gmod_eznade_timed",8}
+				},
+				["timed charges"]={
+					{"ent_jack_gmod_eztimedcharge",4}
+				},
 			},
 			RestrictedPackages={"antimatter"},
 			RestrictedPackageShipTime=600,
@@ -142,9 +165,10 @@ function JMod_InitGlobalConfig()
 			["EZ Fumigator"]={"ent_jack_gmod_ezfumigator",{parts=30,gas=100,chemicals=50}},
 			["EZ Fougasse Mine"]={"ent_jack_gmod_ezfougasse",{parts=20,fuel=100,explosives=5}},
 			["EZ Detpack"]={"ent_jack_gmod_ezdetpack",{parts=5,explosives=20}},
+			["EZ Time Bomb"]={"ent_jack_gmod_eztimebomb",{parts=30,explosives=180}},
 			["EZ Build Kit"]={"ent_jack_gmod_ezbuildkit",{parts=100,advparts=20,gas=50,power=50}},
 			["EZ Ammo"]={"ent_jack_gmod_ezammo",{parts=30,chemicals=30,explosives=5}},
-			["EZ Explosives"]={"ent_jack_gmod_ezexplosives",{parts=1,chemicals=100}},
+			["EZ Explosives"]={"ent_jack_gmod_ezexplosives",{parts=5,chemicals=150}},
 			["EZ Medical Supplies"]={"ent_jack_gmod_ezmedsupplies",{parts=50,chemicals=100,advparts=20}}
 		}
 	}
@@ -162,8 +186,8 @@ function JMod_InitGlobalConfig()
 	if not(JMOD_LUA_CONFIG)then
 		JMOD_LUA_CONFIG={
 			BuildFuncs={
-				spawnHL2buggy = function(playa, position, angles)
-					local Ent = ents.Create("prop_vehicle_jeep_old")
+				spawnHL2buggy=function(playa, position, angles)
+					local Ent=ents.Create("prop_vehicle_jeep_old")
 					Ent:SetModel("models/buggy.mdl")
 					Ent:SetKeyValue("vehiclescript","scripts/vehicles/jeep_test.txt")
 					Ent:SetPos(position)
@@ -187,18 +211,18 @@ function ANGLE:GetCopy()
 end
 function table.FullCopy( tab )
 
-	if (!tab) then return nil end
+	if(!tab)then return nil end
 	
-	local res = {}
+	local res={}
 	for k, v in pairs( tab ) do
-		if (type(v) == "table") then
-			res[k] = table.FullCopy(v) -- we need to go derper
-		elseif (type(v) == "Vector") then
-			res[k] = Vector(v.x, v.y, v.z)
-		elseif (type(v) == "Angle") then
-			res[k] = Angle(v.p, v.y, v.r)
+		if(type(v)=="table")then
+			res[k]=table.FullCopy(v) -- we need to go derper
+		elseif(type(v)=="Vector")then
+			res[k]=Vector(v.x, v.y, v.z)
+		elseif(type(v)=="Angle")then
+			res[k]=Angle(v.p, v.y, v.r)
 		else
-			res[k] = v
+			res[k]=v
 		end
 	end
 	
@@ -443,15 +467,15 @@ if(CLIENT)then
 	end
 	usermessage.Hook("JackysFGFloatChange",ChangeFloat)
 	
-	local LastViewAng = false
+	local LastViewAng=false
 	local function SimilarizeAngles(ang1, ang2)
-		ang1.y = math.fmod (ang1.y, 360)
-		ang2.y = math.fmod (ang2.y, 360)
-		if math.abs (ang1.y - ang2.y) > 180 then
-			if ang1.y - ang2.y < 0 then
-				ang1.y = ang1.y + 360
+		ang1.y=math.fmod (ang1.y, 360)
+		ang2.y=math.fmod (ang2.y, 360)
+		if math.abs (ang1.y - ang2.y)>180 then
+			if ang1.y - ang2.y<0 then
+				ang1.y=ang1.y+360
 			else
-				ang1.y = ang1.y - 360
+				ang1.y=ang1.y - 360
 			end
 		end
 	end
@@ -462,16 +486,16 @@ if(CLIENT)then
 		local Wep=ply:GetActiveWeapon()
 		if(IsValid(Wep))then
 			if not(Wep.IsAJackyFunGun)then return end
-			local newAng = uCmd:GetViewAngles()
+			local newAng=uCmd:GetViewAngles()
 			if LastViewAng then
 				SimilarizeAngles (LastViewAng, newAng)
-				local ft = FrameTime()*5
+				local ft=FrameTime()*5
 				local argh=.2
 				if(ply:Crouching())then argh=argh-.05 end
 				if(ply:KeyDown(IN_ATTACK2))then argh=argh-.05 end
-				staggerdir =((staggerdir + ft * VectorRand()):GetNormalized())*argh
-				local diff = newAng - LastViewAng
-				diff = diff * ((LocalPlayer():GetFOV())/75)
+				staggerdir =((staggerdir+ft*VectorRand()):GetNormalized())*argh
+				local diff=newAng - LastViewAng
+				diff=diff*((LocalPlayer():GetFOV())/75)
 				local DerNeuAngle=LastViewAng+diff
 				local addpitch=staggerdir.z*ft
 				local addyaw=staggerdir.x*ft
@@ -480,7 +504,7 @@ if(CLIENT)then
 				uCmd:SetViewAngles(DerNeuAngle)
 			end
 		end
-		LastViewAng = uCmd:GetViewAngles()
+		LastViewAng=uCmd:GetViewAngles()
 	end 
 	hook.Add("CreateMove","JackyFGStagger",Stagger)
 	
@@ -560,12 +584,7 @@ if(SERVER)then
 		if(npc.ShouldRandomlyExplode)then
 			if not(attacker==npc)then
 				local Pos=npc:GetPos()
-				local Sploo=ents.Create("env_explosion")
-				Sploo:SetPos(Pos+VectorRand()*math.Rand(0,100))
-				Sploo:SetKeyValue("iMagnitude","50")
-				Sploo:SetOwner(npc)
-				Sploo:Spawn()
-				Sploo:Activate()
+				JMod_Sploom(npc,Pos+VectorRand()*math.Rand(0,100),50)
 				npc:Remove()
 				Sploo:Fire("explode","",0)
 				timer.Simple(.02,function()
@@ -1236,6 +1255,7 @@ local Hints={
 	["detpack det"]="chat *trigger* \n or concommand jmod_ez_trigger",
 	["binding"]="remember, console commands can be bound to a key",
 	["detpack stick"]="hold E on detpack then release E to stick the detpack",
+	["timebomb stick"]="hold E on timebomb then release E to stick the timebomb",
 	["detpack combo"]="detpacks can destroy props \n multiple combine for more power",
 	["afh"]="E to enter and get healed",
 	["fix"]="tap parts box against to repair",
@@ -1253,11 +1273,10 @@ local Hints={
 	["unpackage"]="double tap alt+E to unpackage",
 	["crafting"]="set resources near workbench in order to use them",
 	["building"]="stand near resources in order to use them",
-	["grenade"]="ALT+E to pick up and arm grenade. LMB for overhand throw and RMB for underhand throw.",
-	["grenade impact"]="Impact grenade detonates on contact with any surface - including when in your hand!",
-	["grenade timed"]="Timed grenade detonates 5 seconds after arming.",
-	["grenade proximity"]="Proximity grenades arm after 5 seconds and detonates when hostiles are near.",
-	["grenade remote"]="Remote grenades can be triggered by saying *trigger* in chat or using concommand jmod_ez_trigger.",
+	["grenade"]="ALT+E to pick up and arm grenade. LMB for hard throw, RMB for soft throw",
+	["grenade remote"]="chat *trigger* \n or concommand jmod_ez_trigger",
+	["disarm"]="tap E to disarm",
+	["mininade"]="mininades can be stuck to larger explosives to trigger them",
 	["customize"]="To customize JMod, or to disable these hints, check out garrysmod/data/jmod_config.txt"
 }
 function JMod_Hint(ply,...)
@@ -1319,11 +1338,10 @@ JMod_EZchemicalsSize=100
 JMod_EZadvPartBoxSize=20
 JMod_EZmedSupplyBoxSize=50
 JMod_EZnutrientBoxSize=100
-JMod_EZcrateSize=30
-JMod_EZpartsCrateSize=20
-JMod_EZnutrientsCrateSize=20
+JMod_EZcrateSize=15
+JMod_EZpartsCrateSize=15
+JMod_EZnutrientsCrateSize=15
 -- TODO
--- when you make the radio, give it a "black BFF" mode easter egg
 -- yeet a wrench easter egg
 -- frickin like ADD npc factions to the whitelist yo, gosh damn
 -- add the crate smoke flare
