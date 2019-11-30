@@ -45,7 +45,7 @@ SWEP.WElements = {
 
 -- TODO Move this elsewhere
 JMod_Fortifications = {
-	[1] = {
+	{
 		name = "Sandbag Corner",
 		model = "models/props_fortifications/sandbags_corner1.mdl",
 		ang = Angle(0,180,0),
@@ -53,7 +53,7 @@ JMod_Fortifications = {
 		fixed = true,
 		cost = {organic = 30}
 	},
-	[2] = {
+	{
 		name = "Sandbag Corner Tall",
 		model = "models/props_fortifications/sandbags_corner1_tall.mdl",
 		ang = Angle(0,180,0),
@@ -61,7 +61,7 @@ JMod_Fortifications = {
 		fixed = true,
 		cost = {organic = 40}
 	},
-	[3] = {
+	{
 		name = "Large Sandbag Corner",
 		model = "models/props_fortifications/sandbags_corner2.mdl",
 		ang = Angle(0,180,0),
@@ -69,7 +69,7 @@ JMod_Fortifications = {
 		fixed = true,
 		cost = {organic = 60}
 	},
-	[4] = {
+	{
 		name = "Large Sandbag Corner - Tall",
 		model = "models/props_fortifications/sandbags_corner2_tall.mdl",
 		ang = Angle(0,180,0),
@@ -77,7 +77,7 @@ JMod_Fortifications = {
 		fixed = true,
 		cost = {organic = 80}
 	},
-	[5] = {
+	{
 		name = "Short Sandbag Line",
 		model = "models/props_fortifications/sandbags_line1.mdl",
 		ang = Angle(0,180,0),
@@ -85,7 +85,7 @@ JMod_Fortifications = {
 		fixed = true,
 		cost = {organic = 50}
 	},
-	[6] = {
+	{
 		name = "Short Sandbag Line - Tall",
 		model = "models/props_fortifications/sandbags_line1_tall.mdl",
 		ang = Angle(0,180,0),
@@ -93,7 +93,7 @@ JMod_Fortifications = {
 		fixed = true,
 		cost = {organic = 60}
 	},
-	[7] = {
+	{
 		name = "Long Sandbag Line",
 		model = "models/props_fortifications/sandbags_line2.mdl",
 		ang = Angle(0,180,0),
@@ -101,7 +101,7 @@ JMod_Fortifications = {
 		fixed = true,
 		cost = {organic = 80}
 	},
-	[8] = {
+	{
 		name = "Long Sandbag Line - Tall",
 		model = "models/props_fortifications/sandbags_line2_tall.mdl",
 		ang = Angle(0,180,0),
@@ -109,42 +109,43 @@ JMod_Fortifications = {
 		fixed = true,
 		cost = {organic = 100}
 	},
-	[9] = {
+	{
 		name = "Dragon's Teeth - Small",
 		model = "models/props_fortifications/dragonsteeth_small.mdl",
 		mass = 300,
 		fixed = true,
 		cost = {stone = 30, metal = 10}
 	},
-	[10] = {
+	{
 		name = "Dragon's Teeth - Large",
 		model = "models/props_fortifications/dragonsteeth_large.mdl",
 		mass = 500,
 		fixed = true,
 		cost = {stone = 50, metal = 10}
 	},
-	[11] = {
+	{
 		name = "Concrete Barrier",
 		model = "models/props_c17/concrete_barrier001a.mdl",
 		mass = 400,
 		fixed = true,
 		cost = {stone = 80}
 	},
-	[12] = {
-		name = "Double Blast Door",
-		model = "models/props_lab/blastdoor001c.mdl",
-		mass = 200,
-		fixed = false,
-		cost = {metal = 50}
-	},
-	[13] = {
-		name = "Wooden Door Barricade",
+	{
+		name = "Wood Door Barricade",
 		model = "models/mosi/fallout4/props/fortifications/doorbarricade.mdl",
 		mass = 50,
 		fixed = false,
 		cost = {wood = 40}
 	},
-	[14] = {
+	{
+		name = "Wood Spike Barricade",
+		model = "models/mosi/fallout4/props/fortifications/wallbarricade02.mdl",
+		pos = Vector(0, 0, -10),
+		mass = 75,
+		fixed = true,
+		cost = {wood = 75}
+	},
+	{
 		name = "Junk Wall",
 		model = "models/mosi/fallout4/props/fortifications/junkwall02.mdl",
 		pos = Vector(0, 0, -10),
@@ -152,7 +153,47 @@ JMod_Fortifications = {
 		fixed = true,
 		cost = {wood = 50, metal = 50}
 	},
-	[15] = {
+	{
+		name = "Junk Wall - Wood",
+		model = "models/mosi/fallout4/props/fortifications/junkwall05.mdl",
+		pos = Vector(0, 0, -10),
+		mass = 120,
+		fixed = true,
+		cost = {wood = 100}
+	},
+	{
+		name = "Junk Wall - Metal",
+		model = "models/mosi/fallout4/props/fortifications/junkwall06.mdl",
+		pos = Vector(0, 0, -10),
+		mass = 260,
+		fixed = true,
+		cost = {metal = 100}
+	},
+	{
+		name = "Junk Wall - Corner",
+		model = "models/mosi/fallout4/props/fortifications/junkwallcorner.mdl",
+		pos = Vector(0, 0, -10),
+		mass = 280,
+		fixed = true,
+		cost = {wood = 70, metal = 70}
+	},
+	{
+		name = "Tall Junk Wall - Metal",
+		model = "models/mosi/fallout4/props/fortifications/junkwalltall02.mdl",
+		pos = Vector(0, 0, -10),
+		mass = 400,
+		fixed = true,
+		cost = {wood = 100, metal = 100}
+	},
+	{
+		name = "Tall Junk Wall - Wood",
+		model = "models/mosi/fallout4/props/fortifications/junkwalltall01.mdl",
+		pos = Vector(0, 0, -10),
+		mass = 350,
+		fixed = true,
+		cost = {wood = 200}
+	},
+	{
 		name = "Junk Doorway",
 		model = "models/mosi/fallout4/props/fortifications/junkwalldoorway.mdl",
 		pos = Vector(0, 0, 	-10),
@@ -160,7 +201,14 @@ JMod_Fortifications = {
 		fixed = true,
 		cost = {wood = 30, metal = 40}
 	},
-	
+	{
+		name = "Junk Guard Tower",
+		model = "models/mosi/fallout4/props/fortifications/guardtower.mdl",
+		pos = Vector(0, 0, 	-10),
+		mass = 250,
+		fixed = true,
+		cost = {wood = 70, metal = 60}
+	},
 }
 
 function SWEP:SetupDataTables()
@@ -250,7 +298,7 @@ end
 
 function SWEP:CountMaterialInRange()
 	local Results={}
-	for k,obj in pairs(ents.FindInSphere(self:GetPos(),150))do
+	for k,obj in pairs(ents.FindInSphere(self:GetPos(),300))do
 		if((obj:GetClass() == "ent_jack_gmod_ezmatcube")and(self:CanSee(obj)))then
 			local Typ=obj.MaterialType
 			Results[Typ]=(Results[Typ] or 0)+obj:GetPhysicsObject():GetMass()
@@ -300,7 +348,7 @@ function SWEP:ConsumeMaterialInRange(requirements)
 end
 
 function SWEP:FindMaterialCube(typ,amt)
-	for k,obj in pairs(ents.FindInSphere(self:GetPos(),150))do
+	for k,obj in pairs(ents.FindInSphere(self:GetPos(),300))do
 		if((obj:GetClass() == "ent_jack_gmod_ezmatcube")and(obj.MaterialType==typ)and(obj:GetPhysicsObject():GetMass()>=amt)and(self:CanSee(obj)))then
 			return obj
 		end
