@@ -46,6 +46,34 @@ SWEP.WElements = {
 -- TODO Move this elsewhere
 JMod_Fortifications = {
 	{
+		name = "Concrete Barrier",
+		model = "models/props_c17/concrete_barrier001a.mdl",
+		mass = 350,
+		fixed = true,
+		cost = {stone = 50}
+	},
+	{
+		name = "Combine Barricade",
+		model = "models/props_combine/combine_barricade_short02a.mdl",
+		mass = 200,
+		fixed = true,
+		cost = {metal = 30, glass = 30}
+	},
+	{
+		name = "Short Fence",
+		model = "models/props_c17/fence02b.mdl",
+		mass = 50,
+		fixed = true,
+		cost = {metal = 30, stone = 10}
+	},
+	{
+		name = "Long Fence",
+		model = "models/props_c17/fence02a.mdl",
+		mass = 75,
+		fixed = true,
+		cost = {metal = 50, stone = 10}
+	},
+	{
 		name = "Sandbag Corner",
 		model = "models/props_fortifications/sandbags_corner1.mdl",
 		ang = Angle(0,180,0),
@@ -124,13 +152,6 @@ JMod_Fortifications = {
 		cost = {stone = 50, metal = 10}
 	},
 	{
-		name = "Concrete Barrier",
-		model = "models/props_c17/concrete_barrier001a.mdl",
-		mass = 400,
-		fixed = true,
-		cost = {stone = 80}
-	},
-	{
 		name = "Wood Door Barricade",
 		model = "models/mosi/fallout4/props/fortifications/doorbarricade.mdl",
 		mass = 50,
@@ -144,6 +165,13 @@ JMod_Fortifications = {
 		mass = 75,
 		fixed = true,
 		cost = {wood = 75}
+	},
+	{
+		name = "Stone Fence",
+		model = "models/mosi/fallout4/props/fortifications/stonewallold01.mdl",
+		mass = 500,
+		fixed = true,
+		cost = {stone = 80}
 	},
 	{
 		name = "Junk Wall",
