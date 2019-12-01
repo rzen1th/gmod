@@ -1838,7 +1838,6 @@ if(SERVER)then
 			end
 		end
 	end
-	
 	function JMod_BlastDoors(blaster,pos,power)
 		for k,door in pairs(ents.FindInSphere(pos,50*power))do
 			if JMod_IsDoor(door) then
