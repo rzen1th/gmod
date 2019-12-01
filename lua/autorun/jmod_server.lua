@@ -1822,11 +1822,7 @@ if(SERVER)then
 				local tbl = table.Copy(ignored)
 				table.RemoveByValue(tbl, prop)
 				
-				local tr = util.TraceLine({
-					startpos = blaster:GetPos(),
-					endpos = propPos,
-					filter = tbl
-				})
+				local tr = util.QuickTrace(pos, propPos - pos, tbl)
 				
 				if (IsValid(tr.Entity) and tr.Entity == prop) then
 					if mass <= DestroyThreshold then
