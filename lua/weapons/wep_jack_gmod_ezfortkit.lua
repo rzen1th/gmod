@@ -30,6 +30,7 @@ SWEP.Secondary.Automatic	= false
 SWEP.Secondary.Ammo			= "none"
 
 SWEP.FortifyRate = 10
+SWEP.DestroyRate = 5
 
 SWEP.ShowViewModel = true
 SWEP.ShowWorldModel=false
@@ -50,28 +51,28 @@ JMod_Fortifications = {
 	{
 		name = "Concrete Barrier",
 		model = "models/props_c17/concrete_barrier001a.mdl",
-		mass = 200,
+		mass = 300,
 		fixed = true,
-		cost = {stone = 40}
+		cost = {stone = 30}
 	},
 	{
 		name = "Combine Barricade",
 		model = "models/props_combine/combine_barricade_short02a.mdl",
-		mass = 80,
+		mass = 120,
 		fixed = true,
-		cost = {metal = 20, glass = 20}
+		cost = {metal = 30, glass = 30}
 	},
 	{
 		name = "Short Fence",
 		model = "models/props_c17/fence02b.mdl",
-		mass = 30,
+		mass = 40,
 		fixed = true,
 		cost = {metal = 20, stone = 10}
 	},
 	{
 		name = "Long Fence",
 		model = "models/props_c17/fence02a.mdl",
-		mass = 40,
+		mass = 60,
 		fixed = true,
 		cost = {metal = 30, stone = 10}
 	},
@@ -79,7 +80,7 @@ JMod_Fortifications = {
 		name = "Sandbag Corner",
 		model = "models/props_fortifications/sandbags_corner1.mdl",
 		ang = Angle(0,180,0),
-		mass = 30,
+		mass = 50,
 		fixed = true,
 		cost = {organic = 30}
 	},
@@ -87,7 +88,7 @@ JMod_Fortifications = {
 		name = "Sandbag Corner Tall",
 		model = "models/props_fortifications/sandbags_corner1_tall.mdl",
 		ang = Angle(0,180,0),
-		mass = 40,
+		mass = 60,
 		fixed = true,
 		cost = {organic = 40}
 	},
@@ -95,7 +96,7 @@ JMod_Fortifications = {
 		name = "Large Sandbag Corner",
 		model = "models/props_fortifications/sandbags_corner2.mdl",
 		ang = Angle(0,180,0),
-		mass = 60,
+		mass = 80,
 		fixed = true,
 		cost = {organic = 60}
 	},
@@ -103,7 +104,7 @@ JMod_Fortifications = {
 		name = "Large Sandbag Corner - Tall",
 		model = "models/props_fortifications/sandbags_corner2_tall.mdl",
 		ang = Angle(0,180,0),
-		mass = 80,
+		mass = 100,
 		fixed = true,
 		cost = {organic = 80}
 	},
@@ -111,54 +112,54 @@ JMod_Fortifications = {
 		name = "Short Sandbag Line",
 		model = "models/props_fortifications/sandbags_line1.mdl",
 		ang = Angle(0,180,0),
-		mass = 30,
+		mass = 50,
 		fixed = true,
-		cost = {organic = 50}
+		cost = {organic = 30}
 	},
 	{
 		name = "Short Sandbag Line - Tall",
 		model = "models/props_fortifications/sandbags_line1_tall.mdl",
 		ang = Angle(0,180,0),
-		mass = 50,
+		mass = 60,
 		fixed = true,
-		cost = {organic = 60}
+		cost = {organic = 40}
 	},
 	{
 		name = "Long Sandbag Line",
 		model = "models/props_fortifications/sandbags_line2.mdl",
 		ang = Angle(0,180,0),
-		mass = 60,
+		mass = 80,
 		fixed = true,
-		cost = {organic = 80}
+		cost = {organic = 60}
 	},
 	{
 		name = "Long Sandbag Line - Tall",
 		model = "models/props_fortifications/sandbags_line2_tall.mdl",
 		ang = Angle(0,180,0),
-		mass = 80,
+		mass = 100,
 		fixed = true,
-		cost = {organic = 100}
+		cost = {organic = 80}
 	},
 	{
 		name = "Dragon's Teeth - Small",
 		model = "models/props_fortifications/dragonsteeth_small.mdl",
-		mass = 200,
+		mass = 500,
 		fixed = true,
 		cost = {stone = 20, metal = 10}
 	},
 	{
 		name = "Dragon's Teeth - Large",
 		model = "models/props_fortifications/dragonsteeth_large.mdl",
-		mass = 300,
+		mass = 700,
 		fixed = true,
 		cost = {stone = 30, metal = 20}
 	},
 	{
 		name = "Wood Door Barricade",
 		model = "models/mosi/fallout4/props/fortifications/doorbarricade.mdl",
-		mass = 30,
+		mass = 20,
 		fixed = false,
-		cost = {wood = 20}
+		cost = {wood = 10}
 	},
 	{
 		name = "Wood Spike Barricade",
@@ -173,13 +174,13 @@ JMod_Fortifications = {
 		model = "models/mosi/fallout4/props/fortifications/stonewallold01.mdl",
 		mass = 300,
 		fixed = true,
-		cost = {stone = 40}
+		cost = {stone = 30}
 	},
 	{
 		name = "Junk Wall",
 		model = "models/mosi/fallout4/props/fortifications/junkwall02.mdl",
 		pos = Vector(0, 0, -10),
-		mass = 100,
+		mass = 200,
 		fixed = true,
 		cost = {wood = 40, metal = 40}
 	},
@@ -187,7 +188,7 @@ JMod_Fortifications = {
 		name = "Junk Wall - Wood",
 		model = "models/mosi/fallout4/props/fortifications/junkwall05.mdl",
 		pos = Vector(0, 0, -10),
-		mass = 60,
+		mass = 120,
 		fixed = true,
 		cost = {wood = 80}
 	},
@@ -195,7 +196,7 @@ JMod_Fortifications = {
 		name = "Junk Wall - Metal",
 		model = "models/mosi/fallout4/props/fortifications/junkwall06.mdl",
 		pos = Vector(0, 0, -10),
-		mass = 180,
+		mass = 240,
 		fixed = true,
 		cost = {metal = 80}
 	},
@@ -203,7 +204,7 @@ JMod_Fortifications = {
 		name = "Junk Wall - Corner",
 		model = "models/mosi/fallout4/props/fortifications/junkwallcorner.mdl",
 		pos = Vector(0, 0, -10),
-		mass = 200,
+		mass = 350,
 		fixed = true,
 		cost = {wood = 60, metal = 60}
 	},
@@ -211,7 +212,7 @@ JMod_Fortifications = {
 		name = "Tall Junk Wall - Metal",
 		model = "models/mosi/fallout4/props/fortifications/junkwalltall02.mdl",
 		pos = Vector(0, 0, -10),
-		mass = 250,
+		mass = 480,
 		fixed = true,
 		cost = {metal = 160}
 	},
@@ -219,7 +220,7 @@ JMod_Fortifications = {
 		name = "Tall Junk Wall - Wood",
 		model = "models/mosi/fallout4/props/fortifications/junkwalltall01.mdl",
 		pos = Vector(0, 0, -10),
-		mass = 200,
+		mass = 320,
 		fixed = true,
 		cost = {wood = 160}
 	},
@@ -227,23 +228,23 @@ JMod_Fortifications = {
 		name = "Junk Doorway",
 		model = "models/mosi/fallout4/props/fortifications/junkwalldoorway.mdl",
 		pos = Vector(0, 0, 	-10),
-		mass = 80,
+		mass = 160,
 		fixed = true,
-		cost = {wood = 40, metal = 30}
+		cost = {wood = 30, metal = 30}
 	},
 	{
 		name = "Junk Guard Tower",
 		model = "models/mosi/fallout4/props/fortifications/guardtower.mdl",
 		pos = Vector(0, 0, 	-10),
-		mass = 200,
+		mass = 350,
 		fixed = true,
-		cost = {wood = 70, metal = 60}
+		cost = {wood = 70, metal = 80}
 	},
 	{
 		name = "Junk Guard Post",
 		model = "models/mosi/fallout4/props/fortifications/guardpost.mdl",
 		pos = Vector(0, 0, 	-10),
-		mass = 50,
+		mass = 60,
 		fixed = true,
 		cost = {wood = 20, metal = 10}
 	},
@@ -449,8 +450,6 @@ function SWEP:PrimaryAttack()
 		mask = MASK_ALL
 	})
 
-	print(ghostTr.Entity)
-	
 	if IsValid(ghostTr.Entity) and ghostTr.Entity.Progress and ghostTr.Entity.EZfortOwner then
 
 		self:SetNextPrimaryFire(CurTime() + 0.5)
@@ -521,6 +520,7 @@ function SWEP:PrimaryAttack()
 		fort.EZnosalvage = true
 		fort.EZfortOwner = self.Owner
 		fort.Progress = 0
+		fort.Build = self:GetSelectedBuild()
 		fort:SetColor(Color(255,255,255,100))
 		fort:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
 		fort:SetRenderMode(RENDERMODE_TRANSALPHA)
@@ -550,10 +550,65 @@ function SWEP:PrimaryAttack()
 end
 
 function SWEP:SecondaryAttack()
-	local fort = self.Owner:GetEyeTrace().Entity
-	if IsValid(fort) and fort.EZfortOwner == self.Owner then
-		fort:Remove()
-		self:SetNextSecondaryFire(CurTime() + 1)
+
+	local tr = self.Owner:GetEyeTrace()
+	local ghostTr = util.TraceLine({
+		start = self.Owner:EyePos(),
+		endpos = self.Owner:EyePos() + tr.Normal * 150,
+		filter = {self.Owner, self},
+		mask = MASK_ALL
+	})
+
+	local fort = ghostTr.Entity
+	local physObj = IsValid(ghostTr.Entity) and fort:GetPhysicsObject()
+	
+	if IsValid(fort) and physObj:IsValid() then
+		
+		local mass = physObj:GetMass()
+		local pos = fort:LocalToWorld(fort:OBBCenter())
+		
+		local shouldRemove = false
+		if fort.Progress then -- or fort.EZfortOwner == self.Owner 
+			shouldRemove = true
+		else
+			fort.DestroyProgress = (fort.DestroyProgress or 0) + self.DestroyRate * (fort.EZfortOwner == self.Owner and 4 or 1)
+			self.Owner:PrintMessage(HUD_PRINTCENTER, "deconstruct: " .. fort.DestroyProgress .. "/" .. mass)
+			if fort.DestroyProgress >= mass then
+				shouldRemove = true
+			else
+				local curProgress = fort.DestroyProgress
+				timer.Simple(2, function() if fort.DestroyProgress == curProgress then fort.DestroyProgress = 0 end end)
+			end
+		end
+	
+		if shouldRemove then
+			
+			local tbl = JMod_Fortifications[fort.Build]
+			if !tbl then return end
+			
+			local mult = fort.Progress and 1 or ((tbl.fixed and physObj:IsMotionEnabled() and 0.25) or 0.5)
+			if fort.EZfortOwner != self.Owner then mult = mult / 2 end
+		
+			if !GetConVar("jmod_debug_fortkit_free"):GetBool() then
+				
+				for matType, amt in pairs(tbl.cost) do
+					JMod_GenerateMaterial(pos, matType, math.Round(amt * mult))
+				end
+				
+				self.Owner:PrintMessage(HUD_PRINTCENTER, "Salvaged for " .. math.Round(mult * 100, 2) .. "% material")
+			
+			end
+			
+			local eff=EffectData()
+			eff:SetOrigin(pos)
+			eff:SetScale(1)
+			util.Effect("eff_jack_gmod_ezbuildsmoke",eff,true,true)
+			fort:Remove()
+		end
+		
+		
+		self:DoAnimation(true)
+		self:SetNextSecondaryFire(CurTime() + 0.5)
 	end
 end
 
