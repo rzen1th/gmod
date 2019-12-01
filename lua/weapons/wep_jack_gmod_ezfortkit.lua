@@ -155,7 +155,7 @@ JMod_Fortifications = {
 		cost = {stone = 60, metal = 20}
 	},
 	{
-		name = "Wood Door Barricade",
+		name = "Wood Door Barricade (physical)",
 		model = "models/mosi/fallout4/props/fortifications/doorbarricade.mdl",
 		mass = 50,
 		fixed = false,
@@ -168,6 +168,13 @@ JMod_Fortifications = {
 		mass = 80,
 		fixed = true,
 		cost = {wood = 20}
+	},
+	{
+		name = "Wood Palette (physical)",
+		model = "models/mosi/fallout4/props/fortifications/woodpalette.mdl",
+		mass = 100,
+		fixed = false,
+		cost = {wood = 30}
 	},
 	{
 		name = "Stone Fence",
@@ -249,18 +256,25 @@ JMod_Fortifications = {
 		cost = {wood = 20, metal = 10}
 	},
 	{
-		name = "Steel Barricade Panel (physical)",
-		model = "models/mosi/fallout4/props/fortifications/barricadewall02.mdl",
-		mass = 900,
-		fixed = false,
-		cost = {metal = 200}
-	},
-	{
-		name = "Steel Barricade Wall",
+		name = "Heavy Duty Barricade Wall",
 		model = "models/mosi/fallout4/props/fortifications/barricadewall01.mdl",
 		mass = 1000,
 		fixed = true,
 		cost = {metal = 300}
+	},
+	{
+		name = "Heavy Duty Barricade Panel (physical)",
+		model = "models/mosi/fallout4/props/fortifications/barricadewall02.mdl",
+		mass = 900,
+		fixed = false,
+		cost = {metal = 150}
+	},
+	{
+		name = "Reinforced Barricade Panel (physical)",
+		model = "models/mosi/fallout4/props/fortifications/barricadepanel02.mdl",
+		mass = 500,
+		fixed = false,
+		cost = {metal = 80}
 	},
 }
 
@@ -321,6 +335,7 @@ if SERVER then
 			ply.fortkitGhost = nil
 		end
 	end)
+
 end
 
 function SWEP:Initialize()
@@ -496,6 +511,9 @@ function SWEP:PrimaryAttack()
 			fort:SetColor(Color(255,255,255,255))
 			fort:SetCollisionGroup(COLLISION_GROUP_NONE)
 			fort:SetRenderMode(RENDERMODE_NORMAL)
+			if !JMod_Fortifications[fort.Build].fixed then
+				timer.Simple(3, function() if IsValid(fort) and fort:GetPhysicsObject():IsValid() then fort:GetPhysicsObject():EnableMotion(true) fort:GetPhysicsObject():Wake() end end)
+			end
 			
 			local eff=EffectData()
 			eff:SetOrigin(fort:LocalToWorld(fort:OBBCenter()))
@@ -540,18 +558,12 @@ function SWEP:PrimaryAttack()
 		fort:SetRenderMode(RENDERMODE_TRANSALPHA)
 		fort:Spawn()
 		fort:DropToFloor()
-		timer.Simple(60, function() if fort.Progress then SafeRemoveEntity(fort) end end)
+		timer.Simple(120, function() if fort.Progress then SafeRemoveEntity(fort) end end)
 		
 		local phys = fort:GetPhysicsObject()
 		if phys:IsValid() then
 			phys:SetMass(tbl.mass)
-			if tbl.fixed then
-				phys:EnableMotion(false)
-				--constraint.Weld(fort,game.GetWorld(),0,0,tbl.mass*10,true,false)
-			else
-				phys:EnableMotion(false)
-				timer.Simple(3, function() if IsValid(fort) and phys:IsValid() then phys:EnableMotion(true) phys:Wake() end end)
-			end
+			phys:EnableMotion(false)
 		end
 		
 		self:DoAnimation(true)
