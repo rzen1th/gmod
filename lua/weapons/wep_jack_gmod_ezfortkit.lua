@@ -267,14 +267,14 @@ JMod_Fortifications = {
 		model = "models/mosi/fallout4/props/fortifications/barricadewall02.mdl",
 		mass = 900,
 		fixed = false,
-		cost = {metal = 150}
+		cost = {metal = 200}
 	},
 	{
 		name = "Reinforced Barricade Panel (physical)",
 		model = "models/mosi/fallout4/props/fortifications/barricadepanel02.mdl",
 		mass = 500,
 		fixed = false,
-		cost = {metal = 80}
+		cost = {metal = 100}
 	},
 }
 
@@ -487,24 +487,6 @@ function SWEP:PrimaryAttack()
 		local mass = fort:GetPhysicsObject():IsValid() and fort:GetPhysicsObject():GetMass() or 100
 		
 		if fort.Progress + self.FortifyRate >= mass then
-		
-			--[[
-			local hullTr = util.TraceEntity({
-				startpos = fort:GetPos(),
-				endpos = fort:GetPos(),
-				filter = fort,
-				mask = MASK_SOLID,
-				collisiongroup = COLLISION_GROUP_NONE,
-				ignoreworld = true,
-			}, fort)
-			]]
-			
-			--if IsValid(hullTr.Entity) and hullTr.Entity != fort then
-			--	print(hullTr.Entity:GetModel())
-			--	self.Owner:PrintMessage(HUD_PRINTCENTER, "Cannot finish - site is obstructed")
-			--	return
-			--else
-			--end
 			
 			fort.Progress = nil
 			self.Owner:PrintMessage(HUD_PRINTCENTER, "fortification: " .. mass .. "/" .. mass)
