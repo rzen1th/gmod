@@ -29,8 +29,8 @@ SWEP.Secondary.DefaultClip	= -1
 SWEP.Secondary.Automatic	= false
 SWEP.Secondary.Ammo			= "none"
 
-SWEP.FortifyRate = 10
-SWEP.DestroyRate = 5
+SWEP.FortifyRate = 20
+SWEP.DestroyRate = 10
 
 SWEP.ShowViewModel = true
 SWEP.ShowWorldModel=false
@@ -143,21 +143,21 @@ JMod_Fortifications = {
 	{
 		name = "Dragon's Teeth - Small",
 		model = "models/props_fortifications/dragonsteeth_small.mdl",
-		mass = 500,
+		mass = 450,
 		fixed = true,
-		cost = {stone = 20, metal = 10}
+		cost = {stone = 30, metal = 10}
 	},
 	{
 		name = "Dragon's Teeth - Large",
 		model = "models/props_fortifications/dragonsteeth_large.mdl",
-		mass = 700,
+		mass = 900,
 		fixed = true,
-		cost = {stone = 30, metal = 20}
+		cost = {stone = 60, metal = 20}
 	},
 	{
 		name = "Wood Door Barricade",
 		model = "models/mosi/fallout4/props/fortifications/doorbarricade.mdl",
-		mass = 20,
+		mass = 50,
 		fixed = false,
 		cost = {wood = 10}
 	},
@@ -165,9 +165,9 @@ JMod_Fortifications = {
 		name = "Wood Spike Barricade",
 		model = "models/mosi/fallout4/props/fortifications/wallbarricade02.mdl",
 		pos = Vector(0, 0, -10),
-		mass = 60,
+		mass = 80,
 		fixed = true,
-		cost = {wood = 40}
+		cost = {wood = 20}
 	},
 	{
 		name = "Stone Fence",
@@ -180,7 +180,7 @@ JMod_Fortifications = {
 		name = "Junk Wall",
 		model = "models/mosi/fallout4/props/fortifications/junkwall02.mdl",
 		pos = Vector(0, 0, -10),
-		mass = 200,
+		mass = 300,
 		fixed = true,
 		cost = {wood = 40, metal = 40}
 	},
@@ -188,31 +188,31 @@ JMod_Fortifications = {
 		name = "Junk Wall - Wood",
 		model = "models/mosi/fallout4/props/fortifications/junkwall05.mdl",
 		pos = Vector(0, 0, -10),
-		mass = 120,
+		mass = 200,
 		fixed = true,
-		cost = {wood = 80}
+		cost = {wood = 50}
 	},
 	{
 		name = "Junk Wall - Metal",
 		model = "models/mosi/fallout4/props/fortifications/junkwall06.mdl",
 		pos = Vector(0, 0, -10),
-		mass = 240,
+		mass = 500,
 		fixed = true,
-		cost = {metal = 80}
+		cost = {metal = 90}
 	},
 	{
 		name = "Junk Wall - Corner",
 		model = "models/mosi/fallout4/props/fortifications/junkwallcorner.mdl",
 		pos = Vector(0, 0, -10),
-		mass = 350,
+		mass = 600,
 		fixed = true,
-		cost = {wood = 60, metal = 60}
+		cost = {wood = 70, metal = 70}
 	},
 	{
 		name = "Tall Junk Wall - Metal",
 		model = "models/mosi/fallout4/props/fortifications/junkwalltall02.mdl",
 		pos = Vector(0, 0, -10),
-		mass = 480,
+		mass = 700,
 		fixed = true,
 		cost = {metal = 160}
 	},
@@ -220,7 +220,7 @@ JMod_Fortifications = {
 		name = "Tall Junk Wall - Wood",
 		model = "models/mosi/fallout4/props/fortifications/junkwalltall01.mdl",
 		pos = Vector(0, 0, -10),
-		mass = 320,
+		mass = 450,
 		fixed = true,
 		cost = {wood = 160}
 	},
@@ -236,7 +236,7 @@ JMod_Fortifications = {
 		name = "Junk Guard Tower",
 		model = "models/mosi/fallout4/props/fortifications/guardtower.mdl",
 		pos = Vector(0, 0, 	-10),
-		mass = 350,
+		mass = 500,
 		fixed = true,
 		cost = {wood = 70, metal = 80}
 	},
@@ -244,9 +244,23 @@ JMod_Fortifications = {
 		name = "Junk Guard Post",
 		model = "models/mosi/fallout4/props/fortifications/guardpost.mdl",
 		pos = Vector(0, 0, 	-10),
-		mass = 60,
+		mass = 80,
 		fixed = true,
 		cost = {wood = 20, metal = 10}
+	},
+	{
+		name = "Steel Barricade Panel (physical)",
+		model = "models/mosi/fallout4/props/fortifications/barricadewall02.mdl",
+		mass = 900,
+		fixed = false,
+		cost = {metal = 200}
+	},
+	{
+		name = "Steel Barricade Wall",
+		model = "models/mosi/fallout4/props/fortifications/barricadewall01.mdl",
+		mass = 1000,
+		fixed = true,
+		cost = {metal = 300}
 	},
 }
 
@@ -542,9 +556,6 @@ function SWEP:PrimaryAttack()
 		
 		self:DoAnimation(true)
 		self:SwitchSelectedBuild(0)
-		self:SetNextPrimaryFire(CurTime() + 1)
-	else
-		self:DoAnimation()
 		self:SetNextPrimaryFire(CurTime() + 1)
 	end
 end
