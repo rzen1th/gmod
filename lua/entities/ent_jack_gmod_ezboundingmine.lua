@@ -18,6 +18,26 @@ function ENT:SetupDataTables()
 	self:NetworkVar("Int",0,"State")
 end
 ---
+
+function ENT:Initialize()
+	self:SetModel("models/grenades/bounding_mine.mdl")
+	self:SetModelScale(1.5)
+	self:PhysicsInit(SOLID_VPHYSICS)
+	self:SetMoveType(MOVETYPE_VPHYSICS)	
+	self:SetSolid(SOLID_VPHYSICS)
+	self:DrawShadow(true)
+	self:SetUseType(SIMPLE_USE)
+	self:GetPhysicsObject():SetMass(10)
+	---
+	timer.Simple(.01,function()
+		self:GetPhysicsObject():SetMass(10)
+		self:GetPhysicsObject():Wake()
+	end)
+	---
+	self:SetState(JMOD_EZ_STATE_OFF)
+
+end
+
 if(SERVER)then
 	function ENT:SpawnFunction(ply,tr)
 		local SpawnPos=tr.HitPos+tr.HitNormal*20
@@ -31,23 +51,6 @@ if(SERVER)then
 		--effectdata:SetEntity(ent)
 		--util.Effect("propspawn",effectdata)
 		return ent
-	end
-	function ENT:Initialize()
-		self:SetModel("models/grenades/bounding_mine.mdl")
-		self:SetModelScale(1.5)
-		self:PhysicsInit(SOLID_VPHYSICS)
-		self:SetMoveType(MOVETYPE_VPHYSICS)	
-		self:SetSolid(SOLID_VPHYSICS)
-		self:DrawShadow(true)
-		self:SetUseType(SIMPLE_USE)
-		self:GetPhysicsObject():SetMass(10)
-		---
-		timer.Simple(.01,function()
-			self:GetPhysicsObject():SetMass(10)
-			self:GetPhysicsObject():Wake()
-		end)
-		---
-		self:SetState(JMOD_EZ_STATE_OFF)
 	end
 	
 	function ENT:Bury(activator)

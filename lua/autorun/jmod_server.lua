@@ -2292,8 +2292,8 @@ if(SERVER)then
 		local OldOwner=ent.Owner
 		if((OldOwner)and(OldOwner==newOwner))then return end
 		ent.Owner=newOwner
-		if not(CPPI)then return end
-		if(ent.CPPISetOwner)then ent:CPPISetOwner(newOwner) end
+		if (CPPI and ent.CPPISetOwner) then ent:CPPISetOwner(newOwner) end -- Prop protection support
+		if WireAddon and ent.Outputs then Wire_TriggerOutput(ent, "Owner", newOwner) end -- Assume any wiremod compat. entity has an Owner field
 	end
 	function JMod_ShouldAttack(self,ent)
 		if not(IsValid(ent))then return false end

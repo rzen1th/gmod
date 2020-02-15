@@ -19,6 +19,41 @@ function ENT:SetupDataTables()
 	self:NetworkVar("Int",0,"State")
 end
 ---
+
+function ENT:Initialize()
+	self.Entity:SetModel("models/props_misc/tobacco_box-1.mdl")
+	self.Entity:SetMaterial("models/entities/mat_jack_c4")
+	self.Entity:SetModelScale(1.25,0)
+	self.Entity:PhysicsInit(SOLID_VPHYSICS)
+	self.Entity:SetMoveType(MOVETYPE_VPHYSICS)	
+	self.Entity:SetSolid(SOLID_VPHYSICS)
+	self.Entity:DrawShadow(true)
+	self.Entity:SetUseType(ONOFF_USE)
+	---
+	timer.Simple(.01,function()
+		self:GetPhysicsObject():SetMass(15)
+		self:GetPhysicsObject():Wake()
+	end)
+	---
+	self:SetState(STATE_OFF)
+	self.NextStick=0
+
+	if WireAddon then
+		self.Inputs = Wire_CreateInputs(self, { "Arm", "Owner" })
+		self.Outputs = Wire_CreateOutputs(self, {"State", "Owner"})
+		Wire_TriggerOutput(self, "State", self.State)
+	end
+
+end
+
+function ENT:TriggerInput(key, value)
+	if key == "Arm" and value > 0 then
+		self:Arm()
+	elseif key == "Owner" and IsValid(value) and value:IsPlayer() then
+		JMod_Owner(value)
+	end
+end
+
 if(SERVER)then
 	function ENT:SpawnFunction(ply,tr)
 		local SpawnPos=tr.HitPos+tr.HitNormal*40
@@ -33,24 +68,7 @@ if(SERVER)then
 		--util.Effect("propspawn",effectdata)
 		return ent
 	end
-	function ENT:Initialize()
-		self.Entity:SetModel("models/props_misc/tobacco_box-1.mdl")
-		self.Entity:SetMaterial("models/entities/mat_jack_c4")
-		self.Entity:SetModelScale(1.25,0)
-		self.Entity:PhysicsInit(SOLID_VPHYSICS)
-		self.Entity:SetMoveType(MOVETYPE_VPHYSICS)	
-		self.Entity:SetSolid(SOLID_VPHYSICS)
-		self.Entity:DrawShadow(true)
-		self.Entity:SetUseType(ONOFF_USE)
-		---
-		timer.Simple(.01,function()
-			self:GetPhysicsObject():SetMass(15)
-			self:GetPhysicsObject():Wake()
-		end)
-		---
-		self:SetState(STATE_OFF)
-		self.NextStick=0
-	end
+
 	function ENT:PhysicsCollide(data,physobj)
 		if(data.DeltaTime>0.2)then
 			if(data.Speed>25)then
@@ -98,6 +116,7 @@ if(SERVER)then
 				self:EmitSound("snd_jack_minearm.wav",60,70)
 				self:SetState(STATE_OFF)
 			end
+			if WireAddon then Wire_TriggerOutput(self, "State", self.State) end
 		else -- player just released the USE key
 			JMod_Hint(Dude,"detpack stick","detpack combo")
 			if((self:IsPlayerHolding())and(self.NextStick<Time))then

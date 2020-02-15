@@ -18,6 +18,41 @@ function ENT:SetupDataTables()
 end
 ---
 
+function ENT:Initialize()
+	self:SetModel("models/mechanics/robotics/a2.mdl")
+	self:SetModelScale(.25,0)
+	self:SetMaterial("models/entities/mat_jack_dynamite")
+	self:SetBodygroup(0,0)
+	self:PhysicsInit(SOLID_VPHYSICS)
+	self:SetMoveType(MOVETYPE_VPHYSICS)	
+	self:SetSolid(SOLID_VPHYSICS)
+	self:DrawShadow(false)
+	if SERVER then self:SetUseType(ONOFF_USE) end
+	---
+	timer.Simple(.01,function()
+		self:GetPhysicsObject():SetMass(10)
+		self:GetPhysicsObject():Wake()
+	end)
+	---
+	self.Fuze=100
+	self:SetState(JMOD_EZ_STATE_OFF)
+
+	if WireAddon then -- Appears to not work because of the model scale
+		self.Inputs = Wire_CreateInputs(self, { "Arm", "Owner" })
+		self.Outputs = Wire_CreateOutputs(self, {"State", "Owner"})
+		Wire_TriggerOutput(self, "State", self.State)
+	end
+
+end
+
+function ENT:TriggerInput(key, value)
+	if key == "Arm" and value > 0 then
+		self:Arm()
+	elseif key == "Owner" and IsValid(value) and value:IsPlayer() then
+		JMod_Owner(value)
+	end
+end
+
 if(SERVER)then
 	function ENT:SpawnFunction(ply,tr)
 		local SpawnPos=tr.HitPos+tr.HitNormal*15
@@ -32,25 +67,7 @@ if(SERVER)then
 		--util.Effect("propspawn",effectdata)
 		return ent
 	end
-	function ENT:Initialize()
-		self:SetModel("models/mechanics/robotics/a2.mdl")
-		self:SetModelScale(.25,0)
-		self:SetMaterial("models/entities/mat_jack_dynamite")
-		self:SetBodygroup(0,0)
-		self:PhysicsInit(SOLID_VPHYSICS)
-		self:SetMoveType(MOVETYPE_VPHYSICS)	
-		self:SetSolid(SOLID_VPHYSICS)
-		self:DrawShadow(false)
-		self:SetUseType(ONOFF_USE)
-		---
-		timer.Simple(.01,function()
-			self:GetPhysicsObject():SetMass(10)
-			self:GetPhysicsObject():Wake()
-		end)
-		---
-		self.Fuze=100
-		self:SetState(JMOD_EZ_STATE_OFF)
-	end
+
 	function ENT:PhysicsCollide(data,physobj)
 		if(data.DeltaTime>0.2 and data.Speed>25)then
 			self:EmitSound("DryWall.ImpactHard")
@@ -71,7 +88,7 @@ if(SERVER)then
 		if(self:GetState()==JMOD_EZ_STATE_ARMED)then return end
 		self:EmitSound("snds_jack_gmod/ignite.wav",60,100)
 		timer.Simple(.5,function()
-			if(IsValid(self))then self:SetState(JMOD_EZ_STATE_ARMED) end
+			if(IsValid(self))then self:SetState(JMOD_EZ_STATE_ARMED) if WireAddon then Wire_TriggerOutput(self, "State", self.State) end end
 		end)
 	end
 	function ENT:Use(activator,activatorAgain,onOff)

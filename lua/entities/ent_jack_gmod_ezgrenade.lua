@@ -29,6 +29,42 @@ function ENT:SetupDataTables()
 	self:NetworkVar("Int",0,"State")
 end
 
+function ENT:Initialize()
+	self:SetModel(self.Model)
+	if self.Material then self:SetMaterial(self.Material) end
+	if self.ModelScale then self:SetModelScale(self.ModelScale,0) end
+	if(self.Color)then self:SetColor(self.Color) end
+	self:PhysicsInit(SOLID_VPHYSICS)
+	self:SetMoveType(MOVETYPE_VPHYSICS)
+	self:SetSolid(SOLID_VPHYSICS)
+	self:DrawShadow(true)
+	if SERVER then self:SetUseType(ONOFF_USE) end
+	---
+	timer.Simple(.01,function()
+		self:GetPhysicsObject():SetMass(self.Mass)
+		self:GetPhysicsObject():Wake()
+	end)
+	---
+	self:SetState(JMOD_EZ_STATE_OFF)
+	self.NextDet=0
+
+	if WireAddon then
+		self.Inputs = Wire_CreateInputs(self, { "Arm", "Owner" })
+		self.Outputs = Wire_CreateOutputs(self, {"State", "Owner"})
+		Wire_TriggerOutput(self, "State", self.State)
+	end
+
+end
+
+function ENT:TriggerInput(key, value)
+	if key == "Arm" and value > 0 then
+		self:Prime()
+		self:Arm()
+	elseif key == "Owner" and IsValid(value) and value:IsPlayer() then
+		JMod_Owner(value)
+	end
+end
+
 if(SERVER)then
 
 	function ENT:SpawnFunction(ply,tr)
@@ -40,26 +76,6 @@ if(SERVER)then
 		ent:Spawn()
 		ent:Activate()
 		return ent
-	end
-	
-	function ENT:Initialize()
-		self:SetModel(self.Model)
-		if self.Material then self:SetMaterial(self.Material) end
-		if self.ModelScale then self:SetModelScale(self.ModelScale,0) end
-		if(self.Color)then self:SetColor(self.Color) end
-		self:PhysicsInit(SOLID_VPHYSICS)
-		self:SetMoveType(MOVETYPE_VPHYSICS)
-		self:SetSolid(SOLID_VPHYSICS)
-		self:DrawShadow(true)
-		self:SetUseType(ONOFF_USE)
-		---
-		timer.Simple(.01,function()
-			self:GetPhysicsObject():SetMass(self.Mass)
-			self:GetPhysicsObject():Wake()
-		end)
-		---
-		self:SetState(JMOD_EZ_STATE_OFF)
-		self.NextDet=0
 	end
 	
 	function ENT:PhysicsCollide(data,physobj)
@@ -134,12 +150,14 @@ if(SERVER)then
 		self:SetState(JMOD_EZ_STATE_PRIMED)
 		self:EmitSound("weapons/pinpull.wav",60,100)
 		self:SetBodygroup(1,1)
+		if WireAddon then Wire_TriggerOutput(self, "State", self.State) end
 	end
 	
 	function ENT:Arm()
 		self:SetBodygroup(2,1)
 		self:SetState(JMOD_EZ_STATE_ARMED)
 		self:SpoonEffect()
+		if WireAddon then Wire_TriggerOutput(self, "State", self.State) end
 	end
 	
 	function ENT:Detonate()
