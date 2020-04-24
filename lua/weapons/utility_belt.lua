@@ -216,6 +216,51 @@ UTILITY_BELT_ITEMS = {
         pos = Vector(-1,-5,0),
         ang = Angle(-90,0,90)
     },
+    ["ent_jack_gmod_ezgasnade"] = {
+        bone = "ValveBiped.Bip01_Spine",
+        model = "models/grenades/gas_grenade.mdl",
+        mat = "",
+        color = Color(255,255,255),
+        scale = Vector(1,1,1),
+        pos = Vector(-1,-5,0),
+        ang = Angle(-90,0,90)
+    },
+    ["ent_jack_gmod_ezsticknade"] = {
+        bone = "ValveBiped.Bip01_Spine",
+        model = "models/grenades/stick_grenade.mdl",
+        mat = "models/mats_jack_nades/stick_grenade",
+        color = Color(255,255,255),
+        scale = Vector(0.9,0.9,0.9),
+        pos = Vector(-1,-1,0),
+        ang = Angle(80,0,90)
+    },
+    ["ent_jack_gmod_ezsticknadebundle"] = {
+        bone = "ValveBiped.Bip01_Spine1",
+        model = "models/grenades/bundle_grenade.mdl",
+        mat = "models/mats_jack_nades/stick_grenade",
+        color = Color(255,255,255),
+        scale = Vector(0.9,0.9,0.9),
+        pos = Vector(-2,-3,0),
+        ang = Angle(90,0,90)
+    },
+    ["ent_jack_gmod_ezsmokenade"] = {
+        bone = "ValveBiped.Bip01_Spine",
+        model = "models/grenades/incendiary_grenade.mdl",
+        mat = "models/mats_jack_nades/smokescreen",
+        color = Color(255,255,255),
+        scale = Vector(1,1,1),
+        pos = Vector(-1,-4,0),
+        ang = Angle(-90,0,90)
+    },
+    ["ent_jack_gmod_ezsignalnade"] = {
+        bone = "ValveBiped.Bip01_Spine",
+        model = "models/grenades/incendiary_grenade.mdl",
+        mat = "models/mats_jack_nades/smokesignal",
+        color = Color(255,255,255),
+        scale = Vector(1,1,1),
+        pos = Vector(-1,-4,0),
+        ang = Angle(-90,0,90)
+    },
     
     -- JMod explosives
     ["ent_jack_gmod_ezboundingmine"] = {
@@ -245,6 +290,45 @@ UTILITY_BELT_ITEMS = {
         pos = Vector(-2,-8,0),
         ang = Angle(-90,0,-90)
     },
+    ["ent_jack_gmod_ezdetpack"] = {
+        bone = "ValveBiped.Bip01_Spine1",
+        model = "models/props_misc/tobacco_box-1.mdl",
+        mat = "models/entities/mat_jack_c4",
+        color = Color(255,255,255),
+        scale = Vector(0.8,0.8,0.8),
+        pos = Vector(-2,-2,0),
+        ang = Angle(90,-90,0)
+    },
+    ["ent_jack_gmod_ezdynamite"] = {
+        bone = "ValveBiped.Bip01_Spine",
+        model = "models/mechanics/robotics/a2.mdl",
+        mat = "models/entities/mat_jack_dynamite",
+        color = Color(255,255,255),
+        scale = Vector(0.2,0.2,0.2),
+        pos = Vector(-2,-2,0),
+        ang = Angle(0,0,0)
+    },
+    ["ent_jack_gmod_ezslam"] = {
+        bone = "ValveBiped.Bip01_Spine",
+        model = "models/weapons/w_jlam.mdl",
+        mat = "",
+        color = Color(255,255,255),
+        scale = Vector(1,1,1),
+        pos = Vector(-2,-2,0),
+        ang = Angle(-90,90,0)
+    },
+    -- On second thought, let's not allow players to lug four nuclear bombs around
+    
+    ["ent_jack_gmod_eznuke_small"] = {
+        bone = "ValveBiped.Bip01_Spine1",
+        model = "models/chappi/mininuq.mdl",
+        mat = "",
+        color = Color(255,255,255),
+        scale = Vector(0.8,0.8,0.8),
+        pos = Vector(-2,-2,0),
+        ang = Angle(0,-90,0)
+    },
+    
 }
 
 -- This is run serverside in singleplayer and clientside on servers, see comment on ActiveSlot
@@ -370,29 +454,18 @@ if SERVER then
         net.Broadcast()
     end
     
-    hook.Add("PlayerSpawn", "utility_belt_spawn", function(ply)
-        ply.BeltSlots = {}
-        net.Start("utility_belt")
-            net.WriteEntity(ply)
-            net.WriteBool(false)
-            net.WriteUInt(0, 4)
-        net.Broadcast()
-    end)
-    
-    hook.Add("PlayerDeath", "utility_belt_drop", function(ply)
-    
-        local wep = ply:GetWeapon("utility_belt")
-        if not IsValid(wep) or not wep.Owner.BeltSlots or table.Count(wep.Owner.BeltSlots) <= 0 then return end
-        
+    function SWEP:ScatterItems(detonate, instant)
+        local j = 0
         for i = 1, 4 do
-            local slot = wep.Owner.BeltSlots[i]
+            local slot = self.Owner.BeltSlots[i]
             if slot ~= nil then
             
                 local tbl = lookup(slot)
-                local bIndex = ply:LookupBone(tbl.bone)
-                local bPos, bAng = ply:GetBonePosition(bIndex)
+                local bIndex = self.Owner:LookupBone(tbl.bone)
+                local bPos, bAng = self.Owner:GetBonePosition(bIndex)
                 local off = UTILITY_BELT_OFFSET[tbl.bone][i]
-                
+                local vel = self.Owner:GetPhysicsObject():GetVelocity()
+        
                 local ent = ents.Create(slot.class)
                 ent:SetModel(tbl.model)
                 ent:SetMaterial(slot.mat or tbl.mat or "")
@@ -413,11 +486,56 @@ if SERVER then
                     ent:SetPos(bPos)
                     ent:SetAngles(bAng)
                 else
-                    ent:SetPos(ply:GetPos())
+                    ent:SetPos(self.Owner:GetPos())
                 end
-                ent:Spawn()
-                ent:GetPhysicsObject():SetVelocity(ply:GetPhysicsObject():GetVelocity())
+                JMod_Owner(ent, self.Owner)
+            
+                if detonate then
+                    timer.Simple(j * 0.1, function()
+                        ent:Spawn()
+                        ent:GetPhysicsObject():SetVelocity(vel)
+                        if instant and ent.Detonate then
+                            ent:Detonate()
+                        elseif not instant then
+                            if ent.Prime then 
+                                ent:Prime()
+                            elseif ent.Arm then 
+                                ent:Arm()
+                            elseif ent.Detonate then
+                                timer.Simple(math.random() + 1, function()
+                                    if IsValid(ent) then ent:Detonate() end
+                                end)
+                            end
+                        end
+                    end)
+                    j = j + 1
+                else
+                    ent:Spawn()
+                    ent:GetPhysicsObject():SetVelocity(vel)
+                end
             end
+        end
+    end
+    
+    hook.Add("PlayerSpawn", "utility_belt_spawn", function(ply)
+        ply.BeltSlots = {}
+        net.Start("utility_belt")
+            net.WriteEntity(ply)
+            net.WriteBool(false)
+            net.WriteUInt(0, 4)
+        net.Broadcast()
+    end)
+    
+    hook.Add("PlayerDeath", "utility_belt_drop", function(ply)
+    
+        local wep = ply:GetWeapon("utility_belt")
+        if not IsValid(wep) or not wep.Owner.BeltSlots or table.Count(wep.Owner.BeltSlots) <= 0 then return end
+        
+        local det = ply:GetWeapon("utility_belt_detonator")
+        if IsValid(det) and det.DeadManSwitch then
+            wep:ScatterItems(true)
+        else
+            wep:ScatterItems(false)
         end
     
     end)
