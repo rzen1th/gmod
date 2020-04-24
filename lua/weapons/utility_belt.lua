@@ -111,7 +111,7 @@ function SWEP:SecondaryAttack()
                         net.WriteString(ent:GetMaterial() or "")
                         net.WriteColor(Color(ent:GetColor().r,ent:GetColor().g,ent:GetColor().b,ent:GetColor().a or 255))
                     net.Broadcast()
-                    wep:FindSlots(false)
+                    self:FindSlots(false)
                 end
                 if SERVER then self.Owner:EmitSound("items/ammopickup.wav") end
                 SafeRemoveEntity(ent)
