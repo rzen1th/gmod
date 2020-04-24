@@ -515,6 +515,7 @@ if SERVER then
                 end
             end
         end
+        self.Owner.BeltSlots = {}
     end
     
     hook.Add("PlayerSpawn", "utility_belt_spawn", function(ply)
