@@ -29,7 +29,8 @@ SWEP.Secondary.DefaultClip	= -1
 SWEP.Secondary.Automatic	= true
 SWEP.Secondary.Ammo			= "none"
 
-SWEP.Slots = {}
+-- Refactored to be on the player
+--Swep.Owner.BeltSlots = {}
 SWEP.SlotCount = 4
 
 -- in Singleplayer, these are maintained serverside and sent to client
@@ -68,7 +69,7 @@ end
 
 function SWEP:Initialize()
 	self:SetHoldType("normal")
-    self.Slots = {}
+    self.Owner.BeltSlots = {}
 end
 
 function SWEP:PrimaryAttack()
@@ -87,11 +88,11 @@ function SWEP:SecondaryAttack()
     local ent = self.Owner:GetEyeTrace().Entity
     if (IsValid(ent) and !ent.TAKEN and ent:GetPos():DistToSqr(self.Owner:GetPos()) <= 100 * 100 and can_pickup(ent)) then
         for i = 1, self.SlotCount do
-            if self.Slots[i] == nil then
+            if self.Owner.BeltSlots[i] == nil then
                 -- Add the item to the slot
                 ent.TAKEN = true
                 
-                self.Slots[i] = {
+                self.Owner.BeltSlots[i] = {
                     class = ent:GetClass(),
                     model = ent:GetModel(),
                     mat = ent:GetMaterial(),
@@ -100,7 +101,7 @@ function SWEP:SecondaryAttack()
                 if game.SinglePlayer() then
                     -- Predicted hooks aren't called on client in singleplayer
                     net.Start("utility_belt")
-                        net.WriteEntity(self)
+                        net.WriteEntity(self.Owner)
                         net.WriteBool(true)
                         net.WriteUInt(i, 4)
                         net.WriteString(ent:GetClass())
@@ -123,22 +124,14 @@ function SWEP:Think()
     
     if not pressed and self.Owner:KeyDown(IN_RELOAD) then
         pressed = true
-        self:FindSlots(true) 
-        surface.PlaySound("ui/buttonrollover.wav") 
+        if (SERVER and game.SinglePlayer()) or (CLIENT and not game.SinglePlayer()) then
+            self:FindSlots(true)
+        end
+        if CLIENT then surface.PlaySound("ui/buttonrollover.wav") end
     elseif pressed and not self.Owner:KeyDown(IN_RELOAD) then
         pressed = false
     end
 end
-
-
-
-hook.Add("StartCommand", "utility_belt_hack", function(ply, cmd)
-    -- Since IN_ATTACK is pressed to release object and also to throw object, this causes the object to be instantly thrown (bad!)
-    -- This blocks IN_ATTACK for a bit so that the player can release IN_ATTACK (or not, I guess) to hold it
-	if cmd:KeyDown(IN_ATTACK) and ply.UTILITY_BELT_HACK then
-		cmd:SetButtons(bit.band(cmd:GetButtons(), bit.bnot(IN_ATTACK)))
-	end
-end)
 
 UTILITY_BELT_OFFSET = {
     ["ValveBiped.Bip01_Spine"] = {
@@ -257,53 +250,56 @@ UTILITY_BELT_ITEMS = {
 -- This is run serverside in singleplayer and clientside on servers, see comment on ActiveSlot
 function SWEP:FindSlots(increment)
 
-    local cur = wep.ActiveSlot - 1
+    print("FindSlots")
+    local cur = self.ActiveSlot - 1
 
-    wep.ActiveSlot = 0
-    wep.NextSlot = 0
+    self.ActiveSlot = 0
+    self.NextSlot = 0
     
     --print("looking for ActiveSlot")
     for i = (increment and 1 or 0), 4 do
         local slot = (cur + i) % 4 + 1
         --print("i = " .. i .. " (" .. slot .. ")")
-        if wep.Slots[slot] then
+        if self.Owner.BeltSlots[slot] then
             --print("found")
-            wep.ActiveSlot = slot
+            self.ActiveSlot = slot
             break
         end
     end
     
-    if wep.ActiveSlot == 0 then return end
-    cur = wep.ActiveSlot - 1
+    if self.ActiveSlot == 0 then return end
+    cur = self.ActiveSlot - 1
     --print("looking for NextSlot")
     for i = 1, 3 do
         local slot = (cur + i) % 4 + 1
         --print("i = " .. i .. " (" .. slot .. ")")
-        if wep.Slots[slot] then
+        if self.Owner.BeltSlots[slot] then
             --print("found")
-            wep.NextSlot = slot
+            self.NextSlot = slot
             break
         end
     end
     
     if SERVER and game.SinglePlayer() then
         net.Start("utility_belt_slot")
-            net.WriteUInt(wep.ActiveSlot, 4)
-            net.WriteUInt(wep.NextSlot, 4)
+            net.WriteUInt(self.ActiveSlot, 4)
+            net.WriteUInt(self.NextSlot, 4)
         net.Send(self.Owner)
     end
 end
 
+// TODO this entire part is wack
 hook.Add("PlayerButtonDown", "utility_belt_key", function(ply, key)
 
     local wep = ply:GetWeapon("utility_belt")
-    if not IsValid(wep) or not wep.Slots or table.Count(wep.Slots) <= 0 or wep.Slots[wep.ActiveSlot] == nil then return end
+    if not IsValid(wep) or not wep.Owner.BeltSlots or table.Count(wep.Owner.BeltSlots) <= 0 or wep.Owner.BeltSlots[wep.ActiveSlot] == nil then return end
 
-    if key == KEY_G and ply:KeyDown(IN_USE) then
-        if game.SinglePlayer() or CLIENT then
+    if key == KEY_G and ply:KeyDown(IN_WALK) then
+        if (SERVER and game.SinglePlayer()) or (CLIENT and not game.SinglePlayer()) then
             wep:FindSlots(true)
         end
-    elseif key == KEY_G and not ply:KeyDown(IN_USE) then
+        if CLIENT then surface.PlaySound("ui/buttonrollover.wav") end
+    elseif key == KEY_G and not ply:KeyDown(IN_WALK) then
         if game.SinglePlayer() then
             wep:ReleaseItem(wep.ActiveSlot)
             wep:FindSlots(false)
@@ -314,6 +310,14 @@ hook.Add("PlayerButtonDown", "utility_belt_key", function(ply, key)
             timer.Simple(0, function() wep:FindSlots(false) end)
         end
     end
+end)
+
+hook.Add("StartCommand", "utility_belt_hack", function(ply, cmd)
+    -- Since IN_ATTACK is pressed to release object and also to throw object, this causes the object to be instantly thrown (bad!)
+    -- This blocks IN_ATTACK for a bit so that the player can release IN_ATTACK (or not, I guess) to hold it
+	if cmd:KeyDown(IN_ATTACK) and ply.UTILITY_BELT_HACK then
+		cmd:SetButtons(bit.band(cmd:GetButtons(), bit.bnot(IN_ATTACK)))
+	end
 end)
 
 if SERVER then
@@ -333,46 +337,55 @@ if SERVER then
     
     function SWEP:ReleaseItem(i)
 
-        if self:GetNextPrimaryFire() > CurTime() or self.Slots[i] == nil or (IsValid(self.LastThrow) and self.LastThrow:IsPlayerHolding()) then return end
+        if self:GetNextPrimaryFire() > CurTime() or self.Owner.BeltSlots[i] == nil or (IsValid(self.LastThrow) and self.LastThrow:IsPlayerHolding()) then return end
         if self.Owner:GetEyeTrace().HitPos:DistToSqr(self.Owner:EyePos()) < 60 * 60 then return end
         self:SetNextPrimaryFire(CurTime() + 1)
         self.LastThrow = nil
 
-        local ent = ents.Create(self.Slots[i].class)
-        ent:SetModel(self.Slots[i].model)
-        ent:SetColor(self.Slots[i].color)
+        local ent = ents.Create(self.Owner.BeltSlots[i].class)
+        ent:SetModel(self.Owner.BeltSlots[i].model)
+        ent:SetColor(self.Owner.BeltSlots[i].color)
         ent:SetPos(self.Owner:EyePos() + self.Owner:GetAimVector() * 30)
         ent:SetAngles(self.Owner:GetAngles())
         ent:Spawn()
         self.Owner.UTILITY_BELT_HACK = true
         if ent.Base == "ent_jack_gmod_ezgrenade" then
-            if self.Owner:KeyDown(IN_ATTACK) then JMod_ThrowablePickup(self.Owner,ent,ent.HardThrowStr,ent.SoftThrowStr) end
-            if self.Owner:KeyDown(IN_USE) and isfunction(ent.Prime) then ent:Prime() end
+            if self.Owner:KeyDown(IN_USE) then JMod_ThrowablePickup(self.Owner,ent,ent.HardThrowStr,ent.SoftThrowStr) end
+            if self.Owner:KeyDown(IN_ATTACK) and isfunction(ent.Prime) then ent:Prime() end
         else
-            if self.Owner:KeyDown(IN_ATTACK) then self.Owner:PickupObject(ent) end
+            if self.Owner:KeyDown(IN_USE) or self.Owner:KeyDown(IN_ATTACK)then self.Owner:PickupObject(ent) end
         end
         timer.Simple(0.25, function() if IsValid(self.Owner) then self.Owner.UTILITY_BELT_HACK = false end end)
         self.Owner:EmitSound("weapons/zoom.wav")
         self.LastThrow = ent
 
-        self.Slots[i] = nil
+        self.Owner.BeltSlots[i] = nil
         if game.SinglePlayer() then
-            wep:FindSlots(false)
+            self:FindSlots(false)
         end            
         net.Start("utility_belt")
-            net.WriteEntity(self)
+            net.WriteEntity(self.Owner)
             net.WriteBool(false)
             net.WriteUInt(i, 4)
         net.Broadcast()
     end
     
+    hook.Add("PlayerSpawn", "utility_belt_spawn", function(ply)
+        ply.BeltSlots = {}
+        net.Start("utility_belt")
+            net.WriteEntity(ply)
+            net.WriteBool(false)
+            net.WriteUInt(0, 4)
+        net.Broadcast()
+    end)
+    
     hook.Add("PlayerDeath", "utility_belt_drop", function(ply)
     
         local wep = ply:GetWeapon("utility_belt")
-        if not IsValid(wep) or not wep.Slots or table.Count(wep.Slots) <= 0 then return end
+        if not IsValid(wep) or not wep.Owner.BeltSlots or table.Count(wep.Owner.BeltSlots) <= 0 then return end
         
         for i = 1, 4 do
-            local slot = wep.Slots[i]
+            local slot = wep.Owner.BeltSlots[i]
             if slot ~= nil then
             
                 local tbl = lookup(slot)
@@ -413,7 +426,7 @@ end
 if CLIENT then
 
     function SWEP:ReleaseActive()
-        if self.Slots[self.ActiveSlot] == nil then return end
+        if self.Owner.BeltSlots[self.ActiveSlot] == nil then return end
         net.Start("utility_belt")
             net.WriteUInt(self.ActiveSlot, 4)
         net.SendToServer()
@@ -424,24 +437,28 @@ if CLIENT then
     end
     
     net.Receive("utility_belt", function()
-        local wep = net.ReadEntity()
+        local ply = net.ReadEntity()
         local write = net.ReadBool()
         local index = net.ReadUInt(4)
         if write == false then
-            wep.Slots[index] = nil
+            if index == 0 then
+                ply.BeltSlots = {}
+            else
+                ply.BeltSlots[index] = nil
+            end
         else
             local class = net.ReadString()
             local mdl = net.ReadString()
             local mat = net.ReadString()
             local color = net.ReadColor()
-            wep.Slots[index] = {
+            ply.BeltSlots[index] = {
                 class = class,
                 model = mdl,
                 mat = mat,
                 color = color
             }
         end
-        if not game.SinglePlayer() then wep:FindSlots(false) end
+        if not game.SinglePlayer() and ply:GetWeapon("utility_belt") then ply:GetWeapon("utility_belt"):FindSlots(false) end
     end)
     
     net.Receive("utility_belt_slot", function()
@@ -459,7 +476,7 @@ if CLIENT then
     
     hook.Add("HUDPaint", "utility_belt_quickhud", function()
         local wep = LocalPlayer():GetWeapon("utility_belt")
-        if not IsValid(wep) or not wep.Slots or table.Count(wep.Slots) <= 0 then return end
+        if not LocalPlayer():Alive() or not IsValid(wep) or not LocalPlayer().BeltSlots or table.Count(LocalPlayer().BeltSlots) <= 0 then return end
         
         local x = ScrW() * 0.15
         local y = ScrH() - 150
@@ -467,9 +484,9 @@ if CLIENT then
         
         surface.SetDrawColor( 255, 255, 255, 255 )
         
-        if wep.ActiveSlot ~= 0 and wep.Slots[wep.ActiveSlot] ~= nil then
+        if wep.ActiveSlot ~= 0 and LocalPlayer().BeltSlots[wep.ActiveSlot] ~= nil then
 
-            local path = "entities/" .. wep.Slots[wep.ActiveSlot].class
+            local path = "entities/" .. LocalPlayer().BeltSlots[wep.ActiveSlot].class
             if not curmat or curmat:GetName() ~= path then
                 curmat = Material( path .. ".png" )
             end
@@ -483,9 +500,9 @@ if CLIENT then
             draw.SimpleTextOutlined("ACTIVE QUICKBELT", "DermaDefault", x + 64 * scale, y + 2, Color(255,255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(50,50,50))
         end
         
-        if wep.NextSlot ~= 0 and wep.Slots[wep.NextSlot] ~= nil then
+        if wep.NextSlot ~= 0 and LocalPlayer().BeltSlots[wep.NextSlot] ~= nil then
         
-            local path = "entities/" .. wep.Slots[wep.NextSlot].class
+            local path = "entities/" .. LocalPlayer().BeltSlots[wep.NextSlot].class
             if not nextmat or nextmat:GetName() ~= path then
                 nextmat = Material( path .. ".png" )
             end
@@ -510,9 +527,9 @@ if CLIENT then
         ply.BeltModels = ply.BeltModels or {}
         local wep = ply:GetWeapon("utility_belt")
         
-        if not IsValid(wep) or not wep.Slots or table.Count(wep.Slots) <= 0 then 
+        if not LocalPlayer().BeltSlots or table.Count(LocalPlayer().BeltSlots) <= 0 then 
             -- Clean up any models if they exist
-            if IsValid(ply.BeltModels) and istable(ply.BeltModels) and table.Count(wep.Slots) > 0 then 
+            if IsValid(ply.BeltModels) and istable(ply.BeltModels) and table.Count(wep.Owner.BeltSlots) > 0 then 
                 for _, mdl in pairs(ply.BeltModels) do mdl:Remove() end 
             end
             return 
@@ -520,7 +537,7 @@ if CLIENT then
 
         for i = 1, 4 do
         
-            local slot = wep.Slots[i]
+            local slot = wep.Owner.BeltSlots[i]
             
             if not slot then
                 if IsValid(ply.BeltModels[i]) then 
