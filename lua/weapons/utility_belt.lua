@@ -261,6 +261,54 @@ UTILITY_BELT_ITEMS = {
         pos = Vector(-1,-4,0),
         ang = Angle(-90,0,90)
     },
+    ["ent_jack_gmod_ezstickynade"] = {
+        bone = "ValveBiped.Bip01_Spine",
+        model = "models/grenades/sticky_grenade.mdl",
+        mat = "",
+        color = Color(255,255,255),
+        scale = Vector(1,1,1),
+        pos = Vector(-1,-3,0),
+        ang = Angle(90,0,90)
+    },
+    ["ent_jack_gmod_eznade_impact"] = {
+        bone = "ValveBiped.Bip01_Spine",
+        model = "models/weapons/w_fragjade.mdl",
+        mat = "models/mats_jack_nades/gnd_blk",
+        color = Color(255,255,255),
+        scale = Vector(1,1,1),
+        pos = Vector(-1,-4,0),
+        ang = Angle(-90,0,90)
+    },
+    ["ent_jack_gmod_eznade_proximity"] = {
+        bone = "ValveBiped.Bip01_Spine",
+        model = "models/weapons/w_fragjade.mdl",
+        mat = "models/mats_jack_nades/gnd_red",
+        color = Color(255,255,255),
+        scale = Vector(1,1,1),
+        pos = Vector(-1,-4,0),
+        ang = Angle(-90,0,90)
+    },
+    ["ent_jack_gmod_eznade_remote"] = {
+        bone = "ValveBiped.Bip01_Spine",
+        model = "models/weapons/w_fragjade.mdl",
+        mat = "models/mats_jack_nades/gnd_blu",
+        color = Color(255,255,255),
+        scale = Vector(1,1,1),
+        pos = Vector(-1,-4,0),
+        ang = Angle(-90,0,90)
+    },
+    ["ent_jack_gmod_eznade_timed"] = {
+        bone = "ValveBiped.Bip01_Spine",
+        model = "models/weapons/w_fragjade.mdl",
+        mat = "models/mats_jack_nades/gnd_ylw",
+        color = Color(255,255,255),
+        scale = Vector(1,1,1),
+        pos = Vector(-1,-4,0),
+        ang = Angle(-90,0,90)
+    },
+    
+    
+    
     
     -- JMod explosives
     ["ent_jack_gmod_ezboundingmine"] = {
