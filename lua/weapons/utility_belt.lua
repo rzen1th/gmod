@@ -37,8 +37,8 @@ SWEP.SlotCount = 4
 -- in Listen/Dedicated servers, these are clientside
 -- Why? Because predictable hooks don't like to run on client in SP for some reason
 -- and syncing is a headache
-SWEP.ActiveSlot = 0
-SWEP.NextSlot = 0
+--SWEP.ActiveSlot = 0
+--SWEP.NextSlot = 0
 
 local function lookup(slot)
     local tbl = UTILITY_BELT_ITEMS[slot.class]
@@ -70,13 +70,15 @@ end
 function SWEP:Initialize()
 	self:SetHoldType("normal")
     self.Owner.BeltSlots = {}
+    self.ActiveSlot = 0
+    self.NextSlot = 0
 end
 
 function SWEP:PrimaryAttack()
     if CLIENT then
         self:ReleaseActive()
     elseif SERVER and game.SinglePlayer() then
-        self:ReleaseItem(self.ActiveSlot)
+        self:ReleaseItem(self.ActiveSlot, true, self.Owner:KeyDown(IN_USE))
     end
 end
 
@@ -426,14 +428,14 @@ hook.Add("PlayerButtonDown", "utility_belt_key", function(ply, key)
     local wep = ply:GetWeapon("utility_belt")
     if not IsValid(wep) or not wep.Owner.BeltSlots or table.Count(wep.Owner.BeltSlots) <= 0 or wep.Owner.BeltSlots[wep.ActiveSlot] == nil then return end
 
-    if key == KEY_G and ply:KeyDown(IN_WALK) then
+    if key == KEY_G and ply:KeyDown(IN_USE) then
         if (SERVER and game.SinglePlayer()) or (CLIENT and not game.SinglePlayer()) then
             wep:FindSlots(true)
         end
         if CLIENT then surface.PlaySound("ui/buttonrollover.wav") end
-    elseif key == KEY_G and not ply:KeyDown(IN_WALK) then
+    elseif key == KEY_G and not ply:KeyDown(IN_USE) then
         if game.SinglePlayer() then
-            wep:ReleaseItem(wep.ActiveSlot)
+            wep:ReleaseItem(wep.ActiveSlot, not ply:KeyDown(IN_WALK), not ply:KeyDown(IN_WALK))
             wep:FindSlots(false)
         elseif CLIENT then
             net.Start("utility_belt")
@@ -467,10 +469,13 @@ if SERVER then
         wep:ReleaseItem(i)
     end)
     
-    function SWEP:ReleaseItem(i)
+    function SWEP:ReleaseItem(i, pickup, prime)
 
-        if self:GetNextPrimaryFire() > CurTime() or self.Owner.BeltSlots[i] == nil or (IsValid(self.LastThrow) and self.LastThrow:IsPlayerHolding()) then return end
-        if self.Owner:GetEyeTrace().HitPos:DistToSqr(self.Owner:EyePos()) < 60 * 60 then return end
+        if self:GetNextPrimaryFire() > CurTime() then return end
+        self:SetNextPrimaryFire(CurTime() + 0.5)
+        if self.Owner.BeltSlots[i] == nil or (IsValid(self.LastThrow) and self.LastThrow:IsPlayerHolding()) then return end
+        if self.Owner:GetEyeTrace().HitPos:DistToSqr(self.Owner:EyePos()) < 60 * 60
+                or self.Owner:GetEyeTrace().Entity and self.Owner:GetEyeTrace().Entity:GetPos():DistToSqr(self.Owner:EyePos()) < 100 * 100 then return end
         self:SetNextPrimaryFire(CurTime() + 1)
         self.LastThrow = nil
 
@@ -482,10 +487,10 @@ if SERVER then
         ent:Spawn()
         self.Owner.UTILITY_BELT_HACK = true
         if ent.Base == "ent_jack_gmod_ezgrenade" then
-            if self.Owner:KeyDown(IN_USE) then JMod_ThrowablePickup(self.Owner,ent,ent.HardThrowStr,ent.SoftThrowStr) end
-            if self.Owner:KeyDown(IN_ATTACK) and isfunction(ent.Prime) then ent:Prime() end
+            if pickup then JMod_ThrowablePickup(self.Owner,ent,ent.HardThrowStr,ent.SoftThrowStr) end
+            if prime and isfunction(ent.Prime) then ent:Prime() end
         else
-            if self.Owner:KeyDown(IN_USE) or self.Owner:KeyDown(IN_ATTACK)then self.Owner:PickupObject(ent) end
+            if pickup then self.Owner:PickupObject(ent) end
         end
         timer.Simple(0.25, function() if IsValid(self.Owner) then self.Owner.UTILITY_BELT_HACK = false end end)
         self.Owner:EmitSound("weapons/zoom.wav")
