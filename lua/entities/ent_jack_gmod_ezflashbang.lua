@@ -32,7 +32,7 @@ if(SERVER)then
 	function ENT:Detonate()
 		if(self.Exploded)then return end
 		self.Exploded=true
-		local SelfPos=self:GetPos()+Vector(0,0,10)
+		local SelfPos = self:GetPos() + Vector(0,0,10)
 		JMod_Sploom(self.Owner,self:GetPos(),20)
 		self:EmitSound("snd_jack_fragsplodeclose.wav",90,140)
 		self:EmitSound("snd_jack_fragsplodeclose.wav",90,140)
@@ -42,17 +42,18 @@ if(SERVER)then
 		util.ScreenShake(SelfPos,20,20,.2,1000)
 		self:SetColor(Color(0,0,0))
 		timer.Simple(.1,function()
-			if not(IsValid(self))then return end
-			util.BlastDamage(self,self.Owner or self,SelfPos,1000,2)
-			local Time=CurTime()
-			for k,v in pairs(ents.FindInSphere(SelfPos,500))do
-				if((v:IsNPC())and(self:CanSee(v))and(v.SetNPCState))then
-					v:SetNPCState(NPC_STATE_PLAYDEAD)
-					timer.Simple(math.Rand(3,5),function()
-						if(IsValid(v))then v:SetNPCState(NPC_STATE_ALERT) end
-					end)
-				end
-			end
+			if IsValid(self) then
+                util.BlastDamage(self,IsValid(self.Owner) and self.Owner or self, SelfPos,1000,1)
+                local Time=CurTime()
+                for k,v in pairs(ents.FindInSphere(SelfPos,500))do
+                    if((v:IsNPC())and(self:CanSee(v))and(v.SetNPCState))then
+                        v:SetNPCState(NPC_STATE_PLAYDEAD)
+                        timer.Simple(math.Rand(3,5),function()
+                            if(IsValid(v))then v:SetNPCState(NPC_STATE_ALERT) end
+                        end)
+                    end
+                end
+            end
 		end)
 		SafeRemoveEntityDelayed(self,10)
 	end

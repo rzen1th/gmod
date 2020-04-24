@@ -492,8 +492,10 @@ if SERVER then
         if ent.Base == "ent_jack_gmod_ezgrenade" then
             if pickup then JMod_ThrowablePickup(self.Owner,ent,ent.HardThrowStr,ent.SoftThrowStr) end
             if prime and isfunction(ent.Prime) then ent:Prime() end
+            JMod_Owner(ent, self.Owner)
         else
             if pickup then self.Owner:PickupObject(ent) end
+            ent.Owner = self.Owner
         end
         timer.Simple(0.25, function() if IsValid(self.Owner) then self.Owner.UTILITY_BELT_HACK = false end end)
         
