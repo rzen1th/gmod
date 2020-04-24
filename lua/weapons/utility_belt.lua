@@ -433,6 +433,9 @@ hook.Add("PlayerButtonDown", "utility_belt_key", function(ply, key)
             wep:FindSlots(true)
         end
         if CLIENT then surface.PlaySound("ui/buttonrollover.wav") end
+        if SERVER and game.SinglePlayer() then
+            ply:SendLua('surface.PlaySound("ui/buttonrollover.wav")')
+        end
     elseif key == KEY_G and not ply:KeyDown(IN_USE) then
         if game.SinglePlayer() then
             wep:ReleaseItem(wep.ActiveSlot, not ply:KeyDown(IN_WALK), not ply:KeyDown(IN_WALK))
@@ -493,7 +496,13 @@ if SERVER then
             if pickup then self.Owner:PickupObject(ent) end
         end
         timer.Simple(0.25, function() if IsValid(self.Owner) then self.Owner.UTILITY_BELT_HACK = false end end)
-        self.Owner:EmitSound("weapons/zoom.wav")
+        
+        if prime then
+            self.Owner:EmitSound("items/flashlight1.wav")
+        else
+            self.Owner:EmitSound("weapons/zoom.wav")
+        end
+        
         self.LastThrow = ent
 
         self.Owner.BeltSlots[i] = nil
