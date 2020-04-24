@@ -491,6 +491,7 @@ if SERVER then
                 JMod_Owner(ent, self.Owner)
             
                 if detonate then
+                    ent:SetCollisionGroup(COLLISION_GROUP_WEAPON)
                     timer.Simple(j * 0.1, function()
                         ent:Spawn()
                         ent:GetPhysicsObject():SetVelocity(vel)
@@ -516,6 +517,11 @@ if SERVER then
             end
         end
         self.Owner.BeltSlots = {}
+        net.Start("utility_belt")
+            net.WriteEntity(self.Owner)
+            net.WriteBool(false)
+            net.WriteUInt(0, 4)
+        net.Broadcast()
     end
     
     hook.Add("PlayerSpawn", "utility_belt_spawn", function(ply)
