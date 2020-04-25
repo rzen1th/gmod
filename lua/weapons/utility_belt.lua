@@ -3,7 +3,8 @@ AddCSLuaFile()
 SWEP.PrintName	= "Utility Belt"
 
 SWEP.Author		= "8Z"
-SWEP.Purpose	= ""
+SWEP.Purpose	= "Hang some grenades or other items on yourself"
+SWEP.Instructions = "Left Click: Take out active item\nE + Left click: Take out & prime\nRight click: Pick up item\nReload: cycle slots"
 
 SWEP.Spawnable	= true
 SWEP.UseHands	= true
@@ -565,10 +566,10 @@ if SERVER then
                                 ent:Prime()
                             elseif ent.Arm then 
                                 ent:Arm()
-                            elseif ent.Detonate then
-                                timer.Simple(math.random() + 1, function()
-                                    if IsValid(ent) then ent:Detonate() end
-                                end)
+                            --elseif ent.Detonate then
+                            --    timer.Simple(math.random() + 1, function()
+                            --        if IsValid(ent) then ent:Detonate() end
+                            --    end)
                             end
                         end
                     end)

@@ -37,6 +37,7 @@ function SWEP:Initialize()
 end
 
 function SWEP:Holster()
+    --[[
     if self.DeadManSwitch then -- The timer ensures it doesn't run on player death
         local ply = self.Owner
         timer.Simple(0, function()
@@ -47,6 +48,7 @@ function SWEP:Holster()
             end
         end)
     end
+    ]]
     return self:GetNextSecondaryFire() < CurTime()
 end
 
