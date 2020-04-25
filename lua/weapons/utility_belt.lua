@@ -14,6 +14,7 @@ SWEP.DrawCrosshair= false
 SWEP.ViewModel	= "models/weapons/c_arms_citizen.mdl"
 SWEP.WorldModel	= "models/weapons/w_defuser.mdl"
 
+--SWEP.DrawViewModel = false
 SWEP.DrawWorldModel = false
 
 SWEP.ViewModelFOV	= 70
@@ -422,7 +423,7 @@ function SWEP:FindSlots(increment)
     end
 end
 
-// TODO this entire part is wack
+
 hook.Add("PlayerButtonDown", "utility_belt_key", function(ply, key)
 
     local wep = ply:GetWeapon("utility_belt")
@@ -448,6 +449,7 @@ hook.Add("PlayerButtonDown", "utility_belt_key", function(ply, key)
         end
     end
 end)
+
 
 hook.Add("StartCommand", "utility_belt_hack", function(ply, cmd)
     -- Since IN_ATTACK is pressed to release object and also to throw object, this causes the object to be instantly thrown (bad!)
@@ -620,6 +622,10 @@ if CLIENT then
             net.WriteUInt(self.ActiveSlot, 4)
         net.SendToServer()
         timer.Simple(0, function() self:FindSlots(false) end)
+    end
+    
+    function SWEP:ShouldDrawViewModel()
+        return false
     end
     
     function SWEP:DrawWorldModel()
