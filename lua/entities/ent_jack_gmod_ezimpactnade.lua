@@ -19,13 +19,17 @@ if(SERVER)then
 	function ENT:Prime()
 		self:SetState(JMOD_EZ_STATE_PRIMED)
 		self:EmitSound("weapons/pinpull.wav",60,100)
-		self:SpoonEffect()
-		self:SetBodygroup(2,1)
+		timer.Simple(0.15, function()
+            if IsValid(self) then
+                self:SpoonEffect()
+                self:SetBodygroup(2,1)
+            end
+        end)
 	end
 
 	function ENT:Arm()
 		self:SetState(JMOD_EZ_STATE_ARMING)
-		timer.Simple(0.2, function()
+		timer.Simple(0.1, function()
 			if IsValid(self) then
 				self:SetState(JMOD_EZ_STATE_ARMED)
 			end

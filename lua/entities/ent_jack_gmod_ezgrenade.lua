@@ -52,6 +52,7 @@ if(SERVER)then
 		self:SetSolid(SOLID_VPHYSICS)
 		self:DrawShadow(true)
 		self:SetUseType(ONOFF_USE)
+        self:SetCollisionGroup(COLLISION_GROUP_WEAPON)
 		---
 		timer.Simple(.01,function()
 			if IsValid(self) and self:GetPhysicsObject():IsValid() then
