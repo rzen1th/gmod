@@ -6,7 +6,7 @@ ENT.Category="JMod - EZ Explosives"
 ENT.Information="glhfggwpezpznore"
 ENT.PrintName="EZ Micro Nuclear Bomb"
 ENT.Spawnable=true
-ENT.AdminSpawnable=true
+ENT.AdminOnly=true
 ---
 ENT.JModPreferredCarryAngles=Angle(90,0,0)
 ---
