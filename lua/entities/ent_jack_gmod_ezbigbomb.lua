@@ -6,7 +6,6 @@ ENT.Category="JMod - EZ Explosives"
 ENT.Information="glhfggwpezpznore"
 ENT.PrintName="EZ Big Bomb"
 ENT.Spawnable=true
-ENT.AdminOnly=true
 ---
 ENT.JModPreferredCarryAngles=Angle(90,0,0)
 ENT.EZguidable=true
