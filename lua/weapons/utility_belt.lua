@@ -147,8 +147,8 @@ UTILITY_BELT_OFFSET = {
     ["ValveBiped.Bip01_Spine1"] = {
         [1] = {pos = Vector(-3,-4,6), ang = Angle(0,0,70)},
         [2] = {pos = Vector(-3,-4,-6), ang = Angle(0,0,-70)},
-        [3] = {pos = Vector(3,-4,4), ang = Angle(180,180,-30)},
-        [4] = {pos = Vector(3,-4,-4), ang = Angle(180,180,30)},
+        [3] = {pos = Vector(4,-4,4), ang = Angle(180,180,-30)},
+        [4] = {pos = Vector(4,-4,-4), ang = Angle(180,180,30)},
     },
 }
 
@@ -369,8 +369,18 @@ UTILITY_BELT_ITEMS = {
         pos = Vector(-2,-2,0),
         ang = Angle(-90,90,0)
     },
-    -- On second thought, let's not allow players to lug four nuclear bombs around
+    ["ent_jack_gmod_ezsatchelcharge"] = {
+        bone = "ValveBiped.Bip01_Spine1",
+        model = "models/grenades/satchel_charge.mdl",
+        mat = "",
+        color = Color(255,255,255),
+        scale = Vector(1.4,1.4,1.4),
+        pos = Vector(-1,-2,0),
+        ang = Angle(-90,0,0)
+    },
     
+    
+    -- On second thought, let's not allow players to lug four nuclear bombs around
     ["ent_jack_gmod_eznuke_small"] = {
         bone = "ValveBiped.Bip01_Spine1",
         model = "models/chappi/mininuq.mdl",
@@ -561,19 +571,25 @@ if SERVER then
                         ent:Spawn()
                         ent:SetColor(slot.color)
                         ent:GetPhysicsObject():SetVelocity(vel)
-                        if instant and ent.Detonate then
-                            ent:Detonate()
-                        elseif not instant then
-                            if ent.Prime then 
-                                ent:Prime()
-                            elseif ent.Arm then 
-                                ent:Arm()
-                            --elseif ent.Detonate then
-                            --    timer.Simple(math.random() + 1, function()
-                            --        if IsValid(ent) then ent:Detonate() end
-                            --    end)
+                        timer.Simple(0, function() -- This workaround mostly exists for the satchel charge
+                            if IsValid(ent) then
+                                if instant and ent.Detonate then
+                                    ent:Detonate()
+                                elseif not instant then
+                                    if ent:GetClass() == "ent_jack_gmod_ezsatchelcharge" then
+                                        ent:Detonate()
+                                    elseif ent.Prime then 
+                                        ent:Prime()
+                                    elseif ent.Arm then 
+                                        ent:Arm()
+                                    --elseif ent.Detonate then
+                                    --    timer.Simple(math.random() + 1, function()
+                                    --        if IsValid(ent) then ent:Detonate() end
+                                    --    end)
+                                    end
+                                end
                             end
-                        end
+                        end)
                     end)
                     j = j + 1
                 else

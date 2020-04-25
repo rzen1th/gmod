@@ -79,7 +79,7 @@ end
 
 function SWEP:SecondaryAttack()
     if self:GetNextPrimaryFire() > CurTime() or self:GetNextSecondaryFire() > CurTime() then return end
-    self:SetNextSecondaryFire(CurTime() + 2)
+    self:SetNextSecondaryFire(CurTime() + 1.5)
 
     local wep = self.Owner:GetWeapon("utility_belt")
     if not IsValid(wep) then
