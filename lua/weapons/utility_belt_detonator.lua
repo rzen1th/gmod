@@ -63,16 +63,22 @@ function SWEP:PrimaryAttack()
         return
     end
     
-    if SERVER then
-        if self.DeadManSwitch then
-            self.DeadManSwitch = false
+    if self.DeadManSwitch then
+        self.DeadManSwitch = false
+        if SERVER then  
             self.Owner:PrintMessage(HUD_PRINTCENTER, "The dead man's switch is disabled.")
             self:EmitSound("weapons/pistol/pistol_empty.wav")
-        else
-            self.DeadManSwitch = true
+        end
+    else
+        self.DeadManSwitch = true
+        if SERVER then
             self.Owner:PrintMessage(HUD_PRINTCENTER, "The dead man's switch is enabled.")
             self:EmitSound("buttons/button1.wav") 
         end
+    end
+    
+    if game.SinglePlayer() then -- God damn singleplayer shit
+        self.Owner:SendLua("LocalPlayer():GetWeapon('utility_belt_detonator').DeadManSwitch = " .. (self.DeadManSwitch and "true" or "false"))
     end
     
 end

@@ -645,6 +645,9 @@ if CLIENT then
     end
     
     function SWEP:DrawWorldModel()
+        if not IsValid(self.Owner) then
+            self:DrawModel() -- Show the world model when nobody is holding it
+        end
     end
     
     net.Receive("utility_belt", function()
@@ -681,17 +684,18 @@ if CLIENT then
     
     local matOverlay_Normal = Material( "gui/ContentIcon-normal.png" )
     local matOverlay_Hovered = Material( "gui/ContentIcon-hovered.png" )
-    local mat_hover = Material("vgui/spawnmenu/hover")
+    local mat_Detonator = Material("sprites/mat_jack_clacker")
     local curmat = nil
     local nextmat = nil
     
     hook.Add("HUDPaint", "utility_belt_quickhud", function()
         local wep = LocalPlayer():GetWeapon("utility_belt")
-        if not LocalPlayer():Alive() or not IsValid(wep) or not LocalPlayer().BeltSlots or table.Count(LocalPlayer().BeltSlots) <= 0 then return end
+        if not LocalPlayer():Alive() or not IsValid(wep) then return end
         
         local x = ScrW() * 0.15
         local y = ScrH() - 150
         local scale = 1
+        local font = "DermaDefault"
         
         surface.SetDrawColor( 255, 255, 255, 255 )
         
@@ -704,13 +708,20 @@ if CLIENT then
             
             surface.SetMaterial( curmat )
             surface.DrawTexturedRect( x + 3, y + 3, (128 - 6) * scale, (128 - 6) * scale )
-            
-            surface.SetMaterial( matOverlay_Normal )
-            surface.DrawTexturedRect( x, y, 128 * scale, 128 * scale )
-
-            draw.SimpleTextOutlined("ACTIVE QUICKBELT", "DermaDefault", x + 64 * scale, y + 2, Color(255,255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(50,50,50))
+        else
+            draw.SimpleTextOutlined("N/A", font, x + 64 * scale, y + 64 * scale, Color(255,255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(50,50,50))
         end
         
+        surface.SetMaterial( matOverlay_Normal )
+        surface.DrawTexturedRect( x, y, 128 * scale, 128 * scale )
+
+        draw.SimpleTextOutlined("ACTIVE QUICKBELT", font, x + 64 * scale, y + 2, Color(255,255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(50,50,50))
+        
+        draw.SimpleTextOutlined( table.Count(LocalPlayer().BeltSlots) .. " / 4 ITEMS", font, x + 64 * scale, y + (128 - 16) * scale, Color(255,255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(50,50,50))
+        
+        local x2 = x + 128 * scale
+        local y2 = y + 64 * scale
+
         if wep.NextSlot ~= 0 and LocalPlayer().BeltSlots[wep.NextSlot] ~= nil then
         
             local path = "entities/" .. LocalPlayer().BeltSlots[wep.NextSlot].class
@@ -718,16 +729,29 @@ if CLIENT then
                 nextmat = Material( path .. ".png" )
             end
             
-            local x2 = x + 128 * scale
-            local y2 = y + 64 * scale
-            
             surface.SetMaterial( nextmat )
             surface.DrawTexturedRect( x2 + 1.5, y2 + 1.5, (64 - 3) * scale, (64 - 3) * scale )
-            
-            surface.SetMaterial( matOverlay_Hovered )
-            surface.DrawTexturedRect( x2, y2, 64 * scale, 64 * scale )
 
-            draw.SimpleTextOutlined("NEXT", "DermaDefault", x2 + 32 * scale, y2 + 2, Color(255,255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(50,50,50))
+        else
+            draw.SimpleTextOutlined("N/A", font, x2 + 32 * scale, y2 + 32 * scale, Color(255,255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(50,50,50))
+        end
+        
+        surface.SetMaterial( matOverlay_Hovered )
+        surface.DrawTexturedRect( x2, y2, 64 * scale, 64 * scale )
+
+        draw.SimpleTextOutlined("NEXT", font, x2 + 32 * scale, y2 + 2, Color(255,255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color(50,50,50))
+        
+        
+        local det = LocalPlayer():GetWeapon("utility_belt_detonator")
+        if IsValid(det) then
+            local x3 = x + (128 - 4) * scale
+            local y3 = y + 4 * scale
+            
+            local s = det.DeadManSwitch
+            surface.SetDrawColor( 255, 255, 255, s and 255 or 100 )
+            surface.SetMaterial( mat_Detonator )
+            surface.DrawTexturedRect( x3, y3, 48 * scale, 48 * scale )
+            draw.SimpleTextOutlined("DMS " .. (s and "ON" or "OFF"), font, x3 + 24 * scale, y3 + 36 * scale, Color(255,255,255, s and 255 or 100), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 1, Color(50,50,50, s and 255 or 100))
         end
         
     end)
