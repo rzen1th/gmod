@@ -384,7 +384,6 @@ UTILITY_BELT_ITEMS = {
 -- This is run serverside in singleplayer and clientside on servers, see comment on ActiveSlot
 function SWEP:FindSlots(increment)
 
-    print("FindSlots")
     local cur = self.ActiveSlot - 1
 
     self.ActiveSlot = 0
@@ -652,7 +651,7 @@ if CLIENT then
     
     net.Receive("utility_belt_slot", function()
         local wep = LocalPlayer():GetWeapon("utility_belt")
-        if not IsValid(wep) or not IsValid(ply) then return end
+        if not IsValid(wep) then return end
         wep.ActiveSlot = net.ReadUInt(4)
         wep.NextSlot = net.ReadUInt(4)
     end)
