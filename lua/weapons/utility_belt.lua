@@ -486,10 +486,10 @@ if SERVER then
 
         local ent = ents.Create(self.Owner.BeltSlots[i].class)
         ent:SetModel(self.Owner.BeltSlots[i].model)
-        ent:SetColor(self.Owner.BeltSlots[i].color)
         ent:SetPos(self.Owner:EyePos() + self.Owner:GetAimVector() * 30)
         ent:SetAngles(self.Owner:GetAngles())
         ent:Spawn()
+        ent:SetColor(self.Owner.BeltSlots[i].color)
         self.Owner.UTILITY_BELT_HACK = true
         if ent.Base == "ent_jack_gmod_ezgrenade" then
             if pickup then JMod_ThrowablePickup(self.Owner,ent,ent.HardThrowStr,ent.SoftThrowStr) end
@@ -535,7 +535,6 @@ if SERVER then
                 local ent = ents.Create(slot.class)
                 ent:SetModel(tbl.model)
                 ent:SetMaterial(slot.mat or tbl.mat or "")
-                ent:SetColor(slot.color)
                 
                 if bIndex and bPos and bAng and off then
                     local r,f,u = bAng:Right(), bAng:Forward(), bAng:Up()
@@ -560,6 +559,7 @@ if SERVER then
                     ent:SetCollisionGroup(COLLISION_GROUP_WEAPON)
                     timer.Simple(j * 0.1, function()
                         ent:Spawn()
+                        ent:SetColor(slot.color)
                         ent:GetPhysicsObject():SetVelocity(vel)
                         if instant and ent.Detonate then
                             ent:Detonate()
@@ -785,9 +785,10 @@ if CLIENT then
                         mdl:EnableMatrix("RenderMultiply",m)
                     end
                     
-                    if tbl.color then
+                    local color = slot.color or tbl.color
+                    if color then
                         local r,g,b=render.GetColorModulation()
-                        render.SetColorModulation(tbl.color.r/255,tbl.color.g/255,tbl.color.b/255)
+                        render.SetColorModulation(color.r/255,color.g/255,color.b/255)
                         mdl:DrawModel()
                         render.SetColorModulation(r,g,b)
                     end

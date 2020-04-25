@@ -41,8 +41,10 @@ if(SERVER)then
 		self.Entity:SetUseType(ONOFF_USE)
 		---
 		timer.Simple(.01,function()
-			self:GetPhysicsObject():SetMass(25)
-			self:GetPhysicsObject():Wake()
+			if IsValid(self) and self:GetPhysicsObject():IsValid() then
+                self:GetPhysicsObject():SetMass(25)
+                self:GetPhysicsObject():Wake()
+            end
 		end)
 		---
 		self:SetState(STATE_OFF)

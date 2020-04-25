@@ -43,8 +43,10 @@ if(SERVER)then
 		self:SetUseType(ONOFF_USE)
 		---
 		timer.Simple(.01,function()
-			self:GetPhysicsObject():SetMass(10)
-			self:GetPhysicsObject():Wake()
+			if IsValid(self) and self:GetPhysicsObject():IsValid() then
+                self:GetPhysicsObject():SetMass(15)
+                self:GetPhysicsObject():Wake()
+            end
 		end)
 		---
 		self.Fuze=100

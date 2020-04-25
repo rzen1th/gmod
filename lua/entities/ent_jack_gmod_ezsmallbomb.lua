@@ -39,9 +39,11 @@ if(SERVER)then
 		self.Entity:SetUseType(SIMPLE_USE)
 		---
 		timer.Simple(.01,function()
-			self:GetPhysicsObject():SetMass(80)
-			self:GetPhysicsObject():Wake()
-			self:GetPhysicsObject():EnableDrag(false)
+			if IsValid(self) and self:GetPhysicsObject():IsValid() then
+                self:GetPhysicsObject():SetMass(80)
+                self:GetPhysicsObject():Wake()
+                self:GetPhysicsObject():EnableDrag(false)
+            end
 		end)
 		---
 		self:SetState(STATE_OFF)
