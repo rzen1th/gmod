@@ -56,8 +56,6 @@ if (SERVER) then
 
         if WireAddon then
             self.Inputs = Wire_CreateInputs(self, {"Arm", "Detonate"})
-            self.Outputs = Wire_CreateOutputs(self, {"State", "Owner"})
-            Wire_TriggerOutput(self, "State", self:GetState())
         end
     end
 

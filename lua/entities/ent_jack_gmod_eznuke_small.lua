@@ -45,6 +45,9 @@ if(SERVER)then
 		end)
 		---
 		self:SetState(STATE_OFF)
+        if WireAddon then
+            self.Inputs = Wire_CreateInputs(self, {"Arm", "Detonate"})
+        end
 	end
 	function ENT:PhysicsCollide(data,physobj)
 		if not(IsValid(self))then return end
