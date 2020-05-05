@@ -51,7 +51,7 @@ if (SERVER) then
         self.LastUse = 0
         self.FreefallTicks = 0
 
-		if WireAddon then
+        if WireAddon then
             self.Inputs = Wire_CreateInputs(self, {"Arm", "Detonate"})
         end
     end
