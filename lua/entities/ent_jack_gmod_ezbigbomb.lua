@@ -48,6 +48,12 @@ if(SERVER)then
 		self:SetState(STATE_OFF)
 		self.LastUse=0
 		self.DetTime=0
+
+        if WireAddon then
+            self.Inputs = Wire_CreateInputs(self, {"Arm", "Detonate"})
+            self.Outputs = Wire_CreateOutputs(self, {"State", "Owner"})
+            Wire_TriggerOutput(self, "State", self:GetState())
+        end
 	end
 	function ENT:PhysicsCollide(data,physobj)
 		if not(IsValid(self))then return end
@@ -193,6 +199,19 @@ if(SERVER)then
 		self:NextThink(CurTime()+.1)
 		return true
 	end
+    function ENT:TriggerInput(key, value)
+        if key == "Arm" and value > 0 and self:GetState() == STATE_OFF then
+            self:SetState(STATE_ARMED)
+            self:EmitSound("snds_jack_gmod/bomb_arm.wav", 70, 110)
+            self.EZdroppableBombArmedTime = CurTime()
+        elseif key == "Arm" and value <= 0 and self:GetState() == STATE_ARMED then
+            self:SetState(STATE_OFF)
+            self:EmitSound("snds_jack_gmod/bomb_disarm.wav", 70, 110)
+            self.EZdroppableBombArmedTime = nil
+        elseif key == "Detonate" and self:GetState() == STATE_ARMED then
+            self:Detonate()
+        end
+    end
 elseif(CLIENT)then
 	function ENT:Initialize()
 		self.Mdl=ClientsideModel("models/jmod/mk82_gbu.mdl")
