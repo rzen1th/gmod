@@ -8,7 +8,7 @@ ENT.PrintName="EZ Detpack"
 ENT.NoSitAllowed=true
 ENT.Spawnable=true
 ENT.AdminSpawnable=true
----
+--- func_breakable
 ENT.JModPreferredCarryAngles=Angle(90,0,180)
 ENT.JModEZdetPack=true
 ENT.JModEZstorable=true
@@ -19,41 +19,6 @@ function ENT:SetupDataTables()
 	self:NetworkVar("Int",0,"State")
 end
 ---
-
-function ENT:Initialize()
-	self.Entity:SetModel("models/props_misc/tobacco_box-1.mdl")
-	self.Entity:SetMaterial("models/entities/mat_jack_c4")
-	self.Entity:SetModelScale(1.25,0)
-	self.Entity:PhysicsInit(SOLID_VPHYSICS)
-	self.Entity:SetMoveType(MOVETYPE_VPHYSICS)	
-	self.Entity:SetSolid(SOLID_VPHYSICS)
-	self.Entity:DrawShadow(true)
-	self.Entity:SetUseType(ONOFF_USE)
-	---
-	timer.Simple(.01,function()
-		self:GetPhysicsObject():SetMass(15)
-		self:GetPhysicsObject():Wake()
-	end)
-	---
-	self:SetState(STATE_OFF)
-	self.NextStick=0
-
-	if WireAddon then
-		self.Inputs = Wire_CreateInputs(self, { "Arm", "Owner" })
-		self.Outputs = Wire_CreateOutputs(self, {"State", "Owner"})
-		Wire_TriggerOutput(self, "State", self.State)
-	end
-
-end
-
-function ENT:TriggerInput(key, value)
-	if key == "Arm" and value > 0 then
-		self:Arm()
-	elseif key == "Owner" and IsValid(value) and value:IsPlayer() then
-		JMod_Owner(value)
-	end
-end
-
 if(SERVER)then
 	function ENT:SpawnFunction(ply,tr)
 		local SpawnPos=tr.HitPos+tr.HitNormal*40
@@ -63,12 +28,26 @@ if(SERVER)then
 		JMod_Owner(ent,ply)
 		ent:Spawn()
 		ent:Activate()
-		--local effectdata=EffectData()
-		--effectdata:SetEntity(ent)
-		--util.Effect("propspawn",effectdata)
 		return ent
 	end
-
+	function ENT:Initialize()
+		self.Entity:SetModel("models/props_misc/tobacco_box-1.mdl")
+		self.Entity:SetMaterial("models/entities/mat_jack_c4")
+		self.Entity:SetModelScale(1.25,0)
+		self.Entity:PhysicsInit(SOLID_VPHYSICS)
+		self.Entity:SetMoveType(MOVETYPE_VPHYSICS)	
+		self.Entity:SetSolid(SOLID_VPHYSICS)
+		self.Entity:DrawShadow(true)
+		self.Entity:SetUseType(ONOFF_USE)
+		---
+		timer.Simple(.01,function()
+			self:GetPhysicsObject():SetMass(15)
+			self:GetPhysicsObject():Wake()
+		end)
+		---
+		self:SetState(STATE_OFF)
+		self.NextStick=0
+	end
 	function ENT:PhysicsCollide(data,physobj)
 		if(data.DeltaTime>0.2)then
 			if(data.Speed>25)then
@@ -95,7 +74,7 @@ if(SERVER)then
 	function ENT:Use(activator,activatorAgain,onOff)
 		local Dude=activator or activatorAgain
 		JMod_Owner(self,Dude)
-		JMod_Hint(activator,"arm","detpack det","binding")
+		
 		local Time=CurTime()
 		if(tobool(onOff))then
 			local State=self:GetState()
@@ -105,20 +84,21 @@ if(SERVER)then
 				if(Alt)then
 					self:SetState(STATE_ARMED)
 					self:EmitSound("snd_jack_minearm.wav",60,100)
+                    JMod_Hint(Dude, "trigger", self)
 				else
 					constraint.RemoveAll(self)
 					self.StuckStick=nil
 					self.StuckTo=nil
 					Dude:PickupObject(self)
 					self.NextStick=Time+.5
+                    JMod_Hint(Dude, "sticky", self)
 				end
 			else
 				self:EmitSound("snd_jack_minearm.wav",60,70)
 				self:SetState(STATE_OFF)
 			end
-			if WireAddon then Wire_TriggerOutput(self, "State", self.State) end
-		else -- player just released the USE key
-			JMod_Hint(Dude,"detpack stick","detpack combo")
+		else
+			
 			if((self:IsPlayerHolding())and(self.NextStick<Time))then
 				local Tr=util.QuickTrace(Dude:GetShootPos(),Dude:GetAimVector()*80,{self,Dude})
 				if(Tr.Hit)then
@@ -128,11 +108,16 @@ if(SERVER)then
 						Ang:RotateAroundAxis(Ang:Right(),90)
 						self:SetAngles(Ang)
 						self:SetPos(Tr.HitPos+Tr.HitNormal*2.35)
-						local Weld=constraint.Weld(self,Tr.Entity,0,Tr.PhysicsBone,10000,false,false)
+						if(Tr.Entity:GetClass()=="func_breakable")then -- crash prevention
+							timer.Simple(0,function() self:GetPhysicsObject():Sleep() end)
+						else
+							local Weld=constraint.Weld(self,Tr.Entity,0,Tr.PhysicsBone,10000,false,false)
+							self.StuckTo=Tr.Entity
+							self.StuckStick=Weld
+						end
 						self.Entity:EmitSound("snd_jack_claythunk.wav",65,math.random(80,120))
 						Dude:DropObject()
-						self.StuckTo=Tr.Entity
-						self.StuckStick=Weld
+                        JMod_Hint(Dude, "arm", self)
 					end
 				end
 			end
@@ -160,6 +145,7 @@ if(SERVER)then
 	function ENT:JModEZremoteTriggerFunc(ply)
 		if not((IsValid(ply))and(ply:Alive())and(ply==self.Owner))then return end
 		if not(self:GetState()==STATE_ARMED)then return end
+        JMod_Hint(ply, "detpack combo", self:GetPos())
 		self:Detonate()
 	end
 	function ENT:Detonate()
@@ -195,9 +181,8 @@ if(SERVER)then
 					local ZaWarudo=game.GetWorld()
 					local Infl,Att=(IsValid(self) and self) or ZaWarudo,(IsValid(self) and IsValid(self.Owner) and self.Owner) or (IsValid(self) and self) or ZaWarudo
 					util.BlastDamage(Infl,Att,SelfPos,300*PowerMult,200*PowerMult)
-					if((IsValid(self.StuckTo))and(IsValid(self.StuckStick)))then
-						util.BlastDamage(Infl,Att,SelfPos,50*PowerMult,600*PowerMult)
-					end
+					-- do a lot of damage point blank, mostly for breaching
+					util.BlastDamage(Infl,Att,SelfPos,20*PowerMult,1700*PowerMult)
 					self:Remove()
 				end)
 			end

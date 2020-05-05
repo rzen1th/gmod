@@ -51,6 +51,8 @@ SWEP.WElements={
 SWEP.LastSalvageAttempt=0
 SWEP.NextSwitch=0
 
+local PackageBlacklist={"func_"}
+
 function SWEP:Initialize()
 	self:SetHoldType("fist")
 	self:SCKInitialize()
@@ -66,7 +68,7 @@ function SWEP:Initialize()
 			{"(action) Package Object","package",{parts=25},1}
 		}
 		for name,info in pairs(JMOD_CONFIG.Blueprints)do
-			table.insert(self.Buildables,{name,info[1],info[2],info[3] or 1})
+			table.insert(self.Buildables,{name,info[1],info[2],info[3] or 1,info[4]})
 		end
 	end
 end
@@ -216,6 +218,9 @@ function SWEP:GetPackagableObject()
 			if(v.Type~="NoCollide")then Constrained=true;break end
 		end
 		if(Constrained)then self:Msg("object is constrained") return nil end
+		for k,v in pairs(PackageBlacklist)do
+			if(string.find(Ent:GetClass(),v))then self:Msg("can't package this") return nil end
+		end
 		return Ent
 	end
 	return nil
@@ -323,7 +328,7 @@ function SWEP:PrimaryAttack()
 			else
 				local Grade=Ent:GetGrade()
 				if(Grade<5)then
-					local UpgradeInfo,UpgradeRate=Ent.EZupgrades.grades[Grade],Ent.EZupgrades.rate
+					local UpgradeInfo,UpgradeRate=Ent.EZupgrades.grades[Grade],Ent.EZupgrades.rate*JMOD_CONFIG.ToolKitUpgradeMult
 					for resourceType,requiredAmt in pairs(UpgradeInfo)do
 						local CurAmt=Ent.UpgradeProgress[resourceType] or 0
 						if(CurAmt<requiredAmt)then
@@ -442,6 +447,7 @@ function SWEP:Reload()
 				if(Build>0)then
 					self:SwitchSelectedBuild(0)
 				else
+                    JMod_Hint(self.Owner, "craft")
 					net.Start("JMod_EZbuildKit")
 						net.WriteTable(self.Buildables)
 						net.WriteEntity(self)
@@ -528,7 +534,7 @@ function SWEP:Deploy()
 		self:UpdateNextIdle()
 		self:EmitSound("snds_jack_gmod/toolbox"..math.random(1,7)..".wav",65,math.random(90,110))
 	end
-	JMod_Hint(self.Owner,"building")
+	if SERVER then JMod_Hint(self.Owner,"building") end
 	self:SetNextPrimaryFire(CurTime()+1)
 	self:SetNextSecondaryFire(CurTime()+1)
 	return true
@@ -546,7 +552,7 @@ function SWEP:Think()
 	else
 		self:SetHoldType("fist")
 	end
-	if(self.NextDeWeldProgress<Time)then
+	if SERVER and self.NextDeWeldProgress<Time then
 		self.NextDeWeldProgress=Time+.25
 		if((self.Owner:KeyDown(IN_RELOAD))and(self.Owner:KeyDown(JMOD_CONFIG.AltFunctionKey))and(SERVER))then
 			local Ent=util.QuickTrace(self.Owner:GetShootPos(),self.Owner:GetAimVector()*70,{self.Owner}).Entity
@@ -582,6 +588,7 @@ function SWEP:Think()
 	end
 end
 function SWEP:DrawHUD()
+    if GetConVar("cl_drawhud"):GetBool() == false then return end
 	local W,H,Msg=ScrW(),ScrH(),self:GetMsg()
 	if((Msg)and(Msg~=""))then
 		draw.SimpleTextOutlined(Msg,"Trebuchet24",W*.5,H*.7-50,Color(255,255,255,150),TEXT_ALIGN_CENTER,TEXT_ALIGN_TOP,3,Color(0,0,0,150))

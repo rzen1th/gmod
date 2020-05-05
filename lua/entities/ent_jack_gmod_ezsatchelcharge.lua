@@ -36,7 +36,8 @@ if(SERVER)then
 		self:SetState(JMOD_EZ_STATE_PRIMED)
 		self.Plunger:SetParent(nil)
 		constraint.NoCollide(self,self.Plunger,0,0)
-		constraint.Rope(self,self.Plunger,0,0,Vector(0,0,0),Vector(0,0,0),1200,0,0,.5,"cable/cable",false)
+		constraint.Rope(self,self.Plunger,0,0,Vector(0,0,0),Vector(0,0,0),2000,0,0,.5,"cable/cable",false)
+		timer.Simple(0,function() self.Plunger:SetPos(self:GetPos()+Vector(0,0,20)) end)
 	end
 
 	function ENT:Arm()
@@ -55,10 +56,11 @@ if(SERVER)then
 			if(State==JMOD_EZ_STATE_OFF and Alt)then
 				self:Prime()
 				activator:PickupObject(self.Plunger)
+                JMod_Hint(Dude, "arm satchelcharge", self.Plunger)
 			else
 				activator:PickupObject(self)
+                JMod_Hint(Dude, "arm", self)
 			end
-			if self.Hints then JMod_Hint(activator,unpack(self.Hints)) end
 		end
 	end
 	
@@ -89,7 +91,7 @@ if(SERVER)then
 				timer.Simple(0,function()
 					local ZaWarudo=game.GetWorld()
 					local Infl,Att=(IsValid(self) and self) or ZaWarudo,(IsValid(self) and IsValid(self.Owner) and self.Owner) or (IsValid(self) and self) or ZaWarudo
-					util.BlastDamage(Infl,Att,SelfPos,120*PowerMult,180*PowerMult)
+					util.BlastDamage(Infl,Att,SelfPos,100*PowerMult,160*PowerMult)
 					self:Remove()
 				end)
 			end

@@ -68,13 +68,14 @@ if(SERVER)then
 						obj:EmitSound("ambient/voices/cough"..math.random(1,4)..".wav",60,math.random(90,110))
 						if(obj.ViewPunch)then obj:ViewPunch(Angle(5,0,0)) end
 					end
+                    if obj:IsPlayer() then JMod_Hint(obj, "gas damage") end
 				end
 			end
 		end
 		local Phys=self:GetPhysicsObject()
 		Phys:SetVelocity(Phys:GetVelocity()*.8)
 		Phys:ApplyForceCenter(Force)
-		self:NextThink(Time+3)
+		self:NextThink(Time+math.Rand(2,4))
 		return true
 	end
 	function ENT:RebuildPhysics()
@@ -108,9 +109,13 @@ elseif(CLIENT)then
 			if(IsValid(self))then self.Visible=math.random(1,5)==2 end
 		end)
 		self.NextVisCheck=CurTime()+6
+		self.DebugShow=LocalPlayer().EZshowGasParticles
+		if(self.DebugShow)then self:SetModelScale(2) end
 	end
 	function ENT:DrawTranslucent()
-		--self:DrawModel()
+		if(self.DebugShow)then
+			self:DrawModel()
+		end
 		local Time=CurTime()
 		if(self.NextVisCheck<Time)then
 			self.NextVisCheck=Time+1

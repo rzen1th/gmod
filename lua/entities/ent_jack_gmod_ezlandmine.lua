@@ -28,9 +28,6 @@ if(SERVER)then
 		JMod_Owner(ent,ply)
 		ent:Spawn()
 		ent:Activate()
-		--local effectdata=EffectData()
-		--effectdata:SetEntity(ent)
-		--util.Effect("propspawn",effectdata)
 		return ent
 	end
 	function ENT:Initialize()
@@ -77,16 +74,17 @@ if(SERVER)then
 	function ENT:Use(activator)
 		local State=self:GetState()
 		if(State<0)then return end
-		JMod_Hint(activator,"arm","friends")
+		
 		local Alt=activator:KeyDown(JMOD_CONFIG.AltFunctionKey)
 		if(State==STATE_OFF)then
 			if(Alt)then
 				JMod_Owner(self,activator)
 				net.Start("JMod_MineColor")
-				net.WriteEntity(self)
+                    net.WriteEntity(self)
 				net.Send(activator)
 			else
 				activator:PickupObject(self)
+                JMod_Hint(activator, "arm", self)
 			end
 		else
 			self:EmitSound("snd_jack_minearm.wav",60,70)
@@ -124,29 +122,13 @@ if(SERVER)then
 		util.ScreenShake(SelfPos,99999,99999,1,500)
 		self:EmitSound("snd_jack_fragsplodeclose.wav",90,100)
 		JMod_Sploom(self.Owner,SelfPos,math.random(10,20))
-		for i=1,200 do
-			timer.Simple(i/2000,function()
-				if not(IsValid(self))then return end
-				local Dir=VectorRand()
-				Dir.z=Dir.z/4+.75
-				self:FireBullets({
-					Attacker=self.Owner or game.GetWorld(),
-					Damage=math.random(20,30)*JMOD_CONFIG.MinePower,
-					Force=math.random(10,100),
-					Num=1,
-					Src=SelfPos,
-					Tracer=1,
-					Dir=Dir:GetNormalized(),
-					Spread=Vector(0,0,0)
-				})
-				if(i==100)then util.BlastDamage(self,self.Owner or self,SelfPos,120*JMOD_CONFIG.MinePower,30*JMOD_CONFIG.MinePower) end
-				if(i==200)then self:Remove() end
-			end)
-		end
+		JMod_FragSplosion(self,SelfPos,1000,20*JMOD_CONFIG.MinePower,3000,self.Owner,Up,1.2,3)
+		self:Remove()
 	end
 	function ENT:Arm(armer)
 		local State=self:GetState()
 		if(State~=STATE_OFF)then return end
+        JMod_Hint(armer, "friends", self)
 		JMod_Owner(self,armer)
 		self:SetState(STATE_ARMING)
 		self:EmitSound("snd_jack_minearm.wav",60,110)
@@ -155,6 +137,10 @@ if(SERVER)then
 				if(self:GetState()==STATE_ARMING)then
 					self:SetState(STATE_ARMED)
 					self:DrawShadow(false)
+					local Tr=util.QuickTrace(self:GetPos()+Vector(0,0,20),Vector(0,0,-40),self)
+					if(Tr.Hit)then
+						constraint.Weld(Tr.Entity,self,0,0,20000,false,false)
+					end
 				end
 			end
 		end)

@@ -93,7 +93,7 @@ if(SERVER)then
 	end
 	function ENT:Use(activator,activatorAgain,onOff)
 		local Dude=activator or activatorAgain
-		JMod_Hint(Dude,"arm")
+		
 		JMod_Owner(self,Dude)
 		local Time=CurTime()
 		if(tobool(onOff))then
@@ -102,8 +102,10 @@ if(SERVER)then
 			local Alt=Dude:KeyDown(JMOD_CONFIG.AltFunctionKey)
 			if(State==JMOD_EZ_STATE_OFF and Alt)then
 				self:Arm()
+                JMod_Hint(Dude, "fuse", self)
 			end
 			JMod_ThrowablePickup(Dude,self,500,250)
+            if not Alt then JMod_Hint(Dude, "arm", self) end
 		end
 	end
 	function ENT:Detonate()

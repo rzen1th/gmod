@@ -80,7 +80,7 @@ if(SERVER)then
 		if(IsValid(self.Owner))then
 			JMod_Colorify(self)
 		end
-		JMod_Hint(activator,"arm","slam stick","slam trigger")
+		
 		local Time=CurTime()
 		if(tobool(onOff))then
 			local State=self:GetState()
@@ -101,6 +101,7 @@ if(SERVER)then
 							end
 						end
 					end)
+                    JMod_Hint(Dude, "friends", self)
 				else
 					if !IsValid(self.AttachedBomb) then
 						constraint.RemoveAll(self)
@@ -113,6 +114,7 @@ if(SERVER)then
 						timer.Simple(0, function() self:SetParent(nil);Dude:PickupObject(self) end)
 						self.NextStick=Time+.5
 					end
+                    JMod_Hint(Dude, "sticky", self)
 				end
 			else
 				self:EmitSound("snd_jack_minearm.wav",60,70)
@@ -120,7 +122,7 @@ if(SERVER)then
 				self:SetBodygroup(0,0)
 			end
 		else -- player just released the USE key
-			JMod_Hint(Dude,"slam stick")
+			
 			if((self:IsPlayerHolding())and(self.NextStick<Time) and !IsValid(self.AttachedBomb))then
 				local Tr=util.QuickTrace(Dude:GetShootPos(),Dude:GetAimVector()*80,{self,Dude})
 				if(Tr.Hit)then
@@ -135,13 +137,18 @@ if(SERVER)then
 							self.AttachedBomb=Tr.Entity
 							timer.Simple(0,function() self:SetParent(Tr.Entity) end)
 						else
-							local Weld=constraint.Weld(self,Tr.Entity,0,Tr.PhysicsBone,10000,false,false)
-							self.StuckTo=Tr.Entity
-							self.StuckStick=Weld
+							if(Tr.Entity:GetClass()=="func_breakable")then -- crash prevention
+								timer.Simple(0,function() self:GetPhysicsObject():Sleep() end)
+							else
+								local Weld=constraint.Weld(self,Tr.Entity,0,Tr.PhysicsBone,10000,false,false)
+								self.StuckTo=Tr.Entity
+								self.StuckStick=Weld
+							end
 						end
 						
 						self:EmitSound("snd_jack_claythunk.wav",65,math.random(80,120))
 						Dude:DropObject()
+                        if not JMod_Hint(Dude, "arm", self) then JMod_Hint(Dude, "slam stick", self) end
 					end
 				end
 			end
@@ -171,14 +178,14 @@ if(SERVER)then
 		local Time=CurTime()
 		local state = self:GetState()
 		if(state==JMOD_EZ_STATE_ARMED)then
-			local pos = self:GetAttachment(1).Pos
-			local trace = util.QuickTrace(pos,self:GetUp()*1000,self)
-			if((math.abs(self.BeamFrac - trace.Fraction) >= 0.001)and(JMod_ShouldAttack(self,trace.Entity)))then
+			local pos=self:GetAttachment(1).Pos
+			local trace=util.QuickTrace(pos,self:GetUp()*1000,self)
+			if((math.abs(self.BeamFrac-trace.Fraction)>=.001)and(JMod_EnemiesNearPoint(self,trace.HitPos,200)))then
 				if((trace.Entity:IsPlayer())or(trace.Entity:IsNPC()))then
 					self:Detonate()
 				else
 					if((trace.Entity.GetMaxHealth)and(tonumber(trace.Entity:GetMaxHealth()))and(trace.Entity:GetMaxHealth()>=2000))then
-						self:Detonate(.1,751)
+						self:Detonate(.1,600)
 					else
 						self:Detonate(.1)
 					end

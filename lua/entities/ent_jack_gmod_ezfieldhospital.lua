@@ -33,7 +33,7 @@ ENT.DynamicPerfSpecs={
 function ENT:InitPerfSpecs()
 	local Grade=self:GetGrade()
 	for specName,value in pairs(self.StaticPerfSpecs)do self[specName]=value end
-	for specName,value in pairs(self.DynamicPerfSpecs)do self[specName]=value*EZ_GRADE_BUFFS[Grade] end
+	for specName,value in pairs(self.DynamicPerfSpecs)do self[specName]=math.ceil(value*EZ_GRADE_BUFFS[Grade]) end
 end
 function ENT:Upgrade(level)
 	if not(level)then level=self:GetGrade()+1 end
@@ -131,7 +131,7 @@ if(SERVER)then
 		end
 	end
 	function ENT:ConsumeElectricity(amt)
-		amt=(amt or .2)/self.ElectricalEfficiency
+		amt=((amt or .2)/self.ElectricalEfficiency^.5)/2
 		local NewAmt=math.Clamp(self:GetElectricity()-amt,0,self.MaxElectricity)
 		self:SetElectricity(NewAmt)
 		if(NewAmt<=0)then self:TurnOff() end
@@ -168,7 +168,7 @@ if(SERVER)then
 		Phys:SetVelocity(self:GetPhysicsObject():GetVelocity()+VectorRand()*math.Rand(1,300)+self:GetUp()*100)
 		Phys:AddAngleVelocity(VectorRand()*math.Rand(1,10000))
 		if(force)then Phys:ApplyForceCenter(force/7) end
-		SafeRemoveEntityDelayed(Prop,math.random(20,40))
+		SafeRemoveEntityDelayed(Prop,math.random(10,20))
 	end
 	function ENT:Break(dmginfo)
 		if(self:GetState()==STATE_BROKEN)then return end
@@ -202,25 +202,31 @@ if(SERVER)then
 	end
 	function ENT:Use(activator)
 		local State=self:GetState()
-		if(State==STATE_BROKEN)then JMod_Hint(activator,"fix");return end
+		if(State==STATE_BROKEN)then  return end
 		if(State==STATE_OFF)then
-			JMod_Hint(activator,"afh","supplies","upgrade")
-			self:TurnOn()
+			
+            if self:GetElectricity() > 0 then self:TurnOn() JMod_Hint(activator, "afh enter", self)
+            else JMod_Hint(activator, "nopower", self)  end
 		elseif(State==STATE_ON)then
 			if not(IsValid(self.Pod:GetDriver()))then
 				if(self.NextEnter<CurTime())then
 					self.Pod.EZvehicleEjectPos=self.Pod:WorldToLocal(activator:GetPos())
 					activator:EnterVehicle(self.Pod)
+                    JMod_Hint(activator, "afh upgrade")
 				end
 			end
 		end
 	end
-	function ENT:SFX(str)
-		sound.Play("snds_jack_gmod/"..str..".wav",self:GetPos()+Vector(0,0,20)+VectorRand()*10,60,100)
+	function ENT:SFX(str,absPath)
+		if(absPath)then
+			sound.Play(str,self:GetPos()+Vector(0,0,20)+VectorRand()*10,60,math.random(90,110))
+		else
+			sound.Play("snds_jack_gmod/"..str..".wav",self:GetPos()+Vector(0,0,20)+VectorRand()*10,60,100)
+		end
 	end
 	function ENT:TurnOn()
 		if(self:GetState()==STATE_ON)then return end
-		if(self:GetElectricity()<=0)then return end
+		if(self:GetElectricity()<=0)then JMod_Hint(activator, "nopower", self) return end
 		local Time=CurTime()
 		self:SetState(STATE_ON)
 		self:SFX("afh_startup")
@@ -255,9 +261,14 @@ if(SERVER)then
 	end
 	function ENT:TryStartOperation()
 		if not(IsValid(self.Patient))then return end
-		local Helf,Max=self.Patient:Health(),self.Patient:GetMaxHealth()
-		if(Helf>=Max)then return end -- you're not hurt lol gtfo
-		if(self:GetSupplies()<=0)then return end
+		---
+		local override = hook.Run("JMod_CanFieldHospitalStart",self,self.Patient)
+		if override==false then return end
+		if override~=true then
+			local Helf,Max,Rads=self.Patient:Health(),self.Patient:GetMaxHealth(),self.Patient.EZirradiated or 0
+			if((Helf>=Max)and(Rads<=0))then return end -- you're not hurt lol gtfo
+			if(self:GetSupplies()<=0)then return end
+		end
 		self:SetState(STATE_WORKING)
 		self:SFX("afh_spoolup")
 		self:ConsumeElectricity()
@@ -275,7 +286,7 @@ if(SERVER)then
 		local State,Time,Electricity=self:GetState(),CurTime(),self:GetElectricity()
 		if(self.NextRealThink<Time)then
 			if not(IsValid(self.Pod))then self:Remove();return end
-			self.NextRealThink=Time+.5
+			self.NextRealThink=Time+.15
 			if(State==STATE_ON)then
 				if(IsValid(self.Pod:GetDriver()))then
 					self:Seal()
@@ -317,18 +328,38 @@ if(SERVER)then
 	function ENT:TryHeal()
 		local Time=CurTime()
 		if(self.NextHeal>Time)then return end
-		self.NextHeal=Time+1/self.HealSpeed
+		self.NextHeal=Time+1/self.HealSpeed^2.75
 		local Helf,Max,Supplies=self.Patient:Health(),self.Patient:GetMaxHealth(),self:GetSupplies()
 		if(Supplies<=0)then
+            if IsValid(self.Patient) then JMod_Hint(self.Patient, "afh supply") end
 			self:EndOperation(false)
 			return
 		end
-		local Injury=Max-Helf
-		if(Injury>0)then
-			local HealAmt=math.min(Injury,math.ceil(3*self.HealEfficiency^2))
-			self.Patient:SetHealth(Helf+HealAmt)
+		---
+		local override = hook.Run("JMod_FieldHospitalHeal", self, self.Patient)
+		if override == false then return end
+		---
+		local Injury,Rads=Max-Helf,self.Patient.EZirradiated or 0
+		if((Injury>0)or(Rads>0))then
+			if(Rads>0)then
+				self.Patient.EZirradiated=math.Clamp(Rads-self.HealEfficiency*JMOD_CONFIG.MedBayHealMult*5,0,9e9)
+				self:HealEffect("hl1/ambience/steamburst1.wav",true)
+			else
+				local HealAmt=isnumber(override) and math.min(Injury,override) or math.min(Injury,math.ceil(3*self.HealEfficiency*JMOD_CONFIG.MedBayHealMult))
+				self.Patient:SetHealth(Helf+HealAmt)
+				self:HealEffect()
+			end
 			self:ConsumeElectricity(2)
-			self:SetSupplies(Supplies-1)
+			if(math.random(1,2)==1)then self:SetSupplies(Supplies-1) end
+		else
+			self:EndOperation(true)
+		end
+	end
+
+	function ENT:HealEffect(snd,noBlood)
+		if(snd)then
+			self:SFX(snd,true)
+		else
 			for i=1,math.random(1,2) do
 				timer.Simple(math.Rand(.01,.5),function()
 					if(IsValid(self))then self:SFX("ez_robotics/"..math.random(1,42)) end
@@ -337,25 +368,24 @@ if(SERVER)then
 					if(IsValid(self))then self:SFX("ez_medical/"..math.random(1,27)) end
 				end)
 			end
-			for i=1,math.random(2,4) do
-				timer.Simple(math.Rand(.01,1),function()
-					if(IsValid(self))then
-						local Pos=self:GetPos()+self:GetRight()*math.random(-40,50)+self:GetUp()*math.random(48,52)+self:GetForward()*math.random(-5,5)
-						local Poof=EffectData()
-						Poof:SetOrigin(Pos+VectorRand()*5)
-						util.Effect("eff_jack_Gmod_ezhealpoof",Poof,true,true)
-						if(math.random(1,2)==1)then
-							local Blud=EffectData()
-							Blud:SetOrigin(Pos+VectorRand()*5)
-							util.Effect("BloodImpact",Blud,true,true)
-						end
+		end
+		for i=1,math.random(2,4) do
+			timer.Simple(math.Rand(.01,1),function()
+				if(IsValid(self))then
+					local Pos=self:GetPos()+self:GetRight()*math.random(-40,50)+self:GetUp()*math.random(48,52)+self:GetForward()*math.random(-5,5)
+					local Poof=EffectData()
+					Poof:SetOrigin(Pos+VectorRand()*5)
+					util.Effect("eff_jack_Gmod_ezhealpoof",Poof,true,true)
+					if((math.random(1,2)==1)and not(noBlood))then
+						local Blud=EffectData()
+						Blud:SetOrigin(Pos+VectorRand()*5)
+						util.Effect("BloodImpact",Blud,true,true)
 					end
-				end)
-			end
-		else
-			self:EndOperation(true)
+				end
+			end)
 		end
 	end
+
 	function ENT:Whine(serious)
 		local Time=CurTime()
 		if(self.NextWhine<Time)then

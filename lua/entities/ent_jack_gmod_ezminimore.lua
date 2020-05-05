@@ -78,7 +78,7 @@ if(SERVER)then
 	function ENT:Use(activator)
 		local State=self:GetState()
 		if(State<0)then return end
-		JMod_Hint(activator,"arm","friends")
+		
 		local Alt=activator:KeyDown(JMOD_CONFIG.AltFunctionKey)
 		JMod_Owner(self,activator)
 		JMod_Colorify(self)
@@ -87,6 +87,7 @@ if(SERVER)then
 				self:Arm(activator)
 			else
 				activator:PickupObject(self)
+                JMod_Hint(activator, "arm", self)
 			end
 		else
 			self:EmitSound("snd_jack_minearm.wav",60,70)
@@ -108,30 +109,18 @@ if(SERVER)then
 		util.ScreenShake(SelfPos,99999,99999,1,500)
 		self:EmitSound("snd_jack_fragsplodeclose.wav",90,100)
 		JMod_Sploom(self.Owner,SelfPos,math.random(10,20))
-		for i=1,500 do
-			timer.Simple(i/5000,function()
-				if not(IsValid(self))then return end
-				local Dir=(Up+VectorRand()*.9):GetNormalized()
-				Dir.z=Dir.z/4
-				self:FireBullets({
-					Attacker=self.Owner or game.GetWorld(),
-					Damage=math.random(20,30)*JMOD_CONFIG.MinePower,
-					Force=math.random(1,10),
-					Num=1,
-					Src=SelfPos,
-					Tracer=1,
-					Dir=Dir:GetNormalized(),
-					Spread=Vector(0,0,0)
-				})
-				if(i==100)then util.BlastDamage(self,self.Owner or self,SelfPos,20*JMOD_CONFIG.MinePower,30*JMOD_CONFIG.MinePower) end
-				if(i==500)then self:Remove() end
-			end)
+		if(JMOD_CONFIG.FragExplosions)then
+			JMod_FragSplosion(self,SelfPos,1000,10,8000,self.Owner or game.GetWorld(),Up,.9)
+		else
+			util.BlastDamage(self,self.Owner or game.GetWorld(),SelfPos+Up*350,350,110)
 		end
+		self:Remove()
 	end
 	function ENT:Arm(armer)
 		local State=self:GetState()
 		if(State~=STATE_OFF)then return end
 		JMod_Owner(self,armer)
+        JMod_Hint(armer, "friends", self)
 		self:SetState(STATE_ARMING)
 		self:EmitSound("snd_jack_minearm.wav",60,110)
 		timer.Simple(3,function()

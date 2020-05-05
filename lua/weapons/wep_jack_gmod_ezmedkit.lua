@@ -30,6 +30,9 @@ SWEP.Secondary.DefaultClip	= -1
 SWEP.Secondary.Automatic	= true
 SWEP.Secondary.Ammo			= "none"
 
+SWEP.EZaccepts="medsupplies"
+SWEP.EZmaxSupplies=50
+
 SWEP.ShowWorldModel=false
 SWEP.VElements={
 	["syringe"]={ type="Model", model="models/weapons/w_models/w_syringe.mdl", bone="ValveBiped.Bip01_R_Hand", rel="", pos=Vector(3, 1.5, 4), angle=Angle(0, 0, 180), size=Vector(.5, .5, .5), color=Color(255, 255, 255, 255), surpresslightning=false, material="", skin=0, bodygroup={} },
@@ -67,7 +70,7 @@ function SWEP:Initialize()
 	self:SCKInitialize()
 	self.NextIdle=0
 	self:Deploy()
-	self:SetSupplies(100)
+	self:SetSupplies(self.EZmaxSupplies)
 end
 function SWEP:PreDrawViewModel(vm,wep,ply)
 	vm:SetMaterial("engine/occlusionproxy") -- Hide that view model with hacky material
@@ -98,6 +101,7 @@ function SWEP:UpdateNextIdle()
 end
 function SWEP:PrimaryAttack()
 	if(self.Owner:KeyDown(IN_SPEED))then return end
+	if(self:GetSupplies()<0)then return end
 	self:Pawnch()
 	self:SetNextPrimaryFire(CurTime()+.65)
 	self:SetNextSecondaryFire(CurTime()+.85)
@@ -107,56 +111,47 @@ function SWEP:PrimaryAttack()
 		if(IsValid(Ent))then
 			local Hit=false
 			if(Ent:IsPlayer())then
+
+				local override = hook.Run("JMod_MedkitHeal", self.Owner, self.Owner, self)
+				if override == false then return end
+				local healAmt = isnumber(override) and override or 3
+
 				local Helf,Max=Ent:Health(),Ent:GetMaxHealth()
-				if((Helf<0)or(Helf>=Max))then return end
 				Ent.EZhealth=(Ent.EZhealth or 0)
 				local Missing=Max-(Helf+Ent.EZhealth)
-				if(Missing<=0)then return end
-				local AddAmt=math.min(Missing,3)
+				if override == nil then
+					if((Helf<0)or(Helf>=Max))then return end
+					if(Missing<=0)then return end
+				end
+				
+				local AddAmt=math.min(Missing,healAmt*JMOD_CONFIG.MedKitHealMult)
 				self:SetSupplies(self:GetSupplies()-1)
 				Ent.EZhealth=Ent.EZhealth+AddAmt
 				self.Owner:PrintMessage(HUD_PRINTCENTER,"treatment "..Ent.EZhealth+Helf.."/"..Max)
 				Ent:ViewPunch(Angle(math.Rand(-2,2),math.Rand(-2,2),math.Rand(-2,2)))
 				Hit=true
 			elseif((Ent:IsNPC())and(Ent.Health)and(Ent:Health())and(tonumber(Ent:Health())))then
+
+				local override = hook.Run("JMod_MedkitHeal", self.Owner, self.Owner, self)
+				if override == false then return end
+				local healAmt = isnumber(override) and override or 3
+
 				local Helf,Max=Ent:Health(),Ent:GetMaxHealth()
-				if((Helf<0)or(Helf>=Max))then return end
-				local Missing=Max-Helf
-				if(Missing<=0)then return end
-				local AddAmt=math.min(Missing,3)
+				Ent.EZhealth=(Ent.EZhealth or 0)
+				local Missing=Max-(Helf+Ent.EZhealth)
+				if override == nil then
+					if((Helf<0)or(Helf>=Max))then return end
+					if(Missing<=0)then return end
+				end
+				
+				local AddAmt=math.min(Missing,healAmt*JMOD_CONFIG.MedKitHealMult)
 				self:SetSupplies(self:GetSupplies()-1)
 				Ent:SetHealth(Helf+AddAmt)
 				self.Owner:PrintMessage(HUD_PRINTCENTER,"health "..Ent:Health().."/"..Max)
 				Hit=true
 			end
 			if(Hit)then
-				sound.Play("snds_jack_gmod/ez_medical/hit.wav",Pos+Vector(0,0,1),60,math.random(90,110))
-				sound.Play("snds_jack_gmod/ez_medical/"..math.random(1,27)..".wav",Pos,60,math.random(90,110))
-				for i=1,2 do
-					local EffPos=Pos+VectorRand()*3
-					local Eff=EffectData()
-					Eff:SetOrigin(EffPos)
-					Eff:SetFlags(3)
-					Eff:SetColor(0)
-					Eff:SetScale(6)
-					util.Effect("bloodspray",Eff,true,true)
-					local EffTwo=EffectData()
-					EffTwo:SetOrigin(EffPos)
-					util.Effect("BloodImpact",EffTwo,true,true)
-					local Tr=util.QuickTrace(EffPos,VectorRand()*30-Vector(0,0,40),{Ent,self.Owner})
-					if(Tr.Hit)then
-						util.Decal("Blood",Tr.HitPos+Tr.HitNormal,Tr.HitPos-Tr.HitNormal)
-					end
-				end
-				Ent:RemoveAllDecals()
-				if(self:GetSupplies()<=0)then self:Remove();return end
-				timer.Simple(.05,function()
-					if(IsValid(self))then
-						for i=1,2 do
-							self:FlingProp(table.Random(self.Props),Pos)
-						end
-					end
-				end)
+				self:HealEffect(Ent)
 			end
 		end
 	end
@@ -194,6 +189,7 @@ function SWEP:WhomIlookinAt()
 end
 function SWEP:SecondaryAttack()
 	if(self.Owner:KeyDown(IN_SPEED))then return end
+	if(self:GetSupplies()<0)then return end
 	if(SERVER)then
 		if(self.Owner:KeyDown(JMOD_CONFIG.AltFunctionKey))then
 			local Kit=ents.Create("ent_jack_gmod_ezmedkit")
@@ -211,48 +207,63 @@ function SWEP:SecondaryAttack()
 			local Ent=self.Owner
 			local AimVec=Ent:GetAimVector()
 			local Pos=Ent:GetShootPos()-Vector(0,0,10)+AimVec*5
+
+			local override = hook.Run("JMod_MedkitHeal", self.Owner, self.Owner, self)
+			if override == false then return end
+			local healAmt = isnumber(override) and override or 2
+
 			local Helf,Max=Ent:Health(),Ent:GetMaxHealth()
-			if not((Helf<0)or(Helf>=Max))then
-				Ent.EZhealth=(Ent.EZhealth or 0)
-				local Missing=Max-(Helf+Ent.EZhealth)
+			Ent.EZhealth=(Ent.EZhealth or 0)
+			local Missing=Max-(Helf+Ent.EZhealth)
+			if override == nil then
+				if((Helf<0)or(Helf>=Max))then return end
 				if(Missing<=0)then return end
-				local AddAmt=math.min(Missing,2)
-				self:SetSupplies(self:GetSupplies()-1)
-				Ent.EZhealth=Ent.EZhealth+AddAmt
-				self.Owner:PrintMessage(HUD_PRINTCENTER,"treatment "..Ent.EZhealth+Helf.."/"..Max)
-				Ent:ViewPunch(Angle(math.Rand(-2,2),math.Rand(-2,2),math.Rand(-2,2)))
-				---
-				sound.Play("snds_jack_gmod/ez_medical/hit.wav",Pos+Vector(0,0,1),60,math.random(90,110))
-				sound.Play("snds_jack_gmod/ez_medical/"..math.random(1,27)..".wav",Pos,60,math.random(90,110))
-				for i=1,2 do
-					local EffPos=Pos+VectorRand()*3-AimVec*3
-					local Eff=EffectData()
-					Eff:SetOrigin(EffPos)
-					Eff:SetFlags(3)
-					Eff:SetColor(0)
-					Eff:SetScale(6)
-					util.Effect("bloodspray",Eff,true,true)
-					local EffTwo=EffectData()
-					EffTwo:SetOrigin(EffPos)
-					util.Effect("BloodImpact",EffTwo,true,true)
-					local Tr=util.QuickTrace(EffPos,VectorRand()*30-Vector(0,0,40),{Ent})
-					if(Tr.Hit)then
-						util.Decal("Blood",Tr.HitPos+Tr.HitNormal,Tr.HitPos-Tr.HitNormal)
-					end
-				end
-				Ent:RemoveAllDecals()
-				if(self:GetSupplies()<=0)then self:Remove();return end
-				timer.Simple(.05,function()
-					if(IsValid(self))then
-						for i=1,2 do
-							self:FlingProp(table.Random(self.Props),Pos+AimVec*5)
-						end
-					end
-				end)
 			end
+
+			local AddAmt=math.min(Missing,healAmt)
+			self:SetSupplies(self:GetSupplies()-1)
+			Ent.EZhealth=Ent.EZhealth+AddAmt
+			self.Owner:PrintMessage(HUD_PRINTCENTER,"treatment "..Ent.EZhealth+Helf.."/"..Max)
+			self:HealEffect(Ent)
 		end
 	end
 end
+
+function SWEP:HealEffect(Ent)
+
+	local AimVec=Ent:GetAimVector()
+	local Pos=Ent:GetShootPos()-Vector(0,0,10)+AimVec*5
+
+	if(Ent.ViewPunch)then Ent:ViewPunch(Angle(math.Rand(-2,2),math.Rand(-2,2),math.Rand(-2,2))) end
+
+	sound.Play("snds_jack_gmod/ez_medical/hit.wav",Pos+Vector(0,0,1),60,math.random(90,110))
+	sound.Play("snds_jack_gmod/ez_medical/"..math.random(1,27)..".wav",Pos,60,math.random(90,110))
+	for i=1,2 do
+		local EffPos=Pos+VectorRand()*3-AimVec*3
+		local Eff=EffectData()
+		Eff:SetOrigin(EffPos)
+		Eff:SetFlags(3)
+		Eff:SetColor(0)
+		Eff:SetScale(6)
+		util.Effect("bloodspray",Eff,true,true)
+		local EffTwo=EffectData()
+		EffTwo:SetOrigin(EffPos)
+		util.Effect("BloodImpact",EffTwo,true,true)
+		local Tr=util.QuickTrace(EffPos,VectorRand()*30-Vector(0,0,40),{Ent})
+		if(Tr.Hit)then
+			util.Decal("Blood",Tr.HitPos+Tr.HitNormal,Tr.HitPos-Tr.HitNormal)
+		end
+	end
+	Ent:RemoveAllDecals()
+	timer.Simple(.05,function()
+		if(IsValid(self))then
+			for i=1,2 do
+				self:FlingProp(table.Random(self.Props),Pos+AimVec*5)
+			end
+		end
+	end)
+end
+
 function SWEP:OnRemove()
 	self:SCKHolster()
 	if( IsValid( self.Owner ) && CLIENT && self.Owner:IsPlayer() )then
@@ -296,11 +307,13 @@ function SWEP:Think()
 	end
 end
 function SWEP:DrawHUD()
+    if GetConVar("cl_drawhud"):GetBool() == false then return end
 	local W,H,Supplies=ScrW(),ScrH(),self:GetSupplies()
 	draw.SimpleTextOutlined("Supplies: "..Supplies,"Trebuchet24",W*.4,H*.7,Color(255,255,255,200),TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP,3,Color(0,0,0,50))
 	draw.SimpleTextOutlined("LMB: heal target","Trebuchet24",W*.4,H*.7+30,Color(255,255,255,50),TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP,3,Color(0,0,0,50))
 	draw.SimpleTextOutlined("RMB: heal self","Trebuchet24",W*.4,H*.7+60,Color(255,255,255,50),TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP,3,Color(0,0,0,50))
 	draw.SimpleTextOutlined("HOLD ALT+RMB: drop kit","Trebuchet24",W*.4,H*.7+90,Color(255,255,255,50),TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP,3,Color(0,0,0,50))
+	draw.SimpleTextOutlined("ALT+E on medsupplies: refill","Trebuchet24",W*.4,H*.7+120,Color(255,255,255,50),TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP,3,Color(0,0,0,50))
 end
 
 ----------------- shit -------------------

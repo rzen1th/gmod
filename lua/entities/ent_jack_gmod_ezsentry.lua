@@ -294,7 +294,7 @@ if(SERVER)then
 		Phys:SetVelocity(self:GetPhysicsObject():GetVelocity()+VectorRand()*math.Rand(1,300)+self:GetUp()*100)
 		Phys:AddAngleVelocity(VectorRand()*math.Rand(1,10000))
 		if(force)then Phys:ApplyForceCenter(force/7) end
-		SafeRemoveEntityDelayed(Prop,math.random(20,40))
+		SafeRemoveEntityDelayed(Prop,math.random(10,20))
 	end
 	function ENT:Break(dmginfo)
 		if(self:GetState()==STATE_BROKEN)then return end
@@ -323,12 +323,13 @@ if(SERVER)then
 	function ENT:Use(activator)
 		if(activator:IsPlayer())then
 			local State=self:GetState()
-			if(State==STATE_BROKEN)then JMod_Hint(activator,"fix");return end
-			JMod_Hint(activator,"supplies","friends","upgrade","modify")
+			if(State==STATE_BROKEN)then JMod_Hint(activator, "destroyed", self) return end
+			
 			if(State>0)then
 				self:TurnOff()
 			else
-				if(self:GetElectricity()>0)then self:TurnOn(activator) end
+				if (self:GetElectricity()>0) then self:TurnOn(activator) JMod_Hint(activator, "friends", self)
+                else JMod_Hint(activator, "nopower", self) end
 			end
 		end
 	end
@@ -430,6 +431,7 @@ if(SERVER)then
 		self.SearchData.State=0
 		self:SetState(STATE_ENGAGING)
 		self:EmitSound("snds_jack_gmod/ezsentry_engage.wav",65,100)
+        JMod_Hint(self.Owner, "sentry upgrade", self)
 	end
 	function ENT:Disengage()
 		local Time=CurTime()
@@ -444,6 +446,7 @@ if(SERVER)then
 		self.SearchData.State=0
 		self:SetState(STATE_WATCHING)
 		self:EmitSound("snds_jack_gmod/ezsentry_standdown.wav",65,100)
+        JMod_Hint(self.Owner, "sentry modify", self)
 	end
 	function ENT:Think()
 		local Time=CurTime()
@@ -613,7 +616,7 @@ if(SERVER)then
 				sound.Play("snds_jack_gmod/sentry.wav",SelfPos,70,math.random(90,110))
 				ParticleEffect("muzzleflash_g3",ShootPos,AimAng,self)
 			else
-				util.Effect("PistolShellEject",Eff,true,true)
+				util.Effect("ShellEject",Eff,true,true)
 				sound.Play("snds_jack_gmod/sentry_weak.wav",SelfPos,70,math.random(90,110))
 				ParticleEffect("muzzleflash_pistol",ShootPos,AimAng,self)
 			end

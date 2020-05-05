@@ -42,6 +42,29 @@ if(SERVER)then
 		end
 		
 	end
+    
+	function ENT:Use(activator,activatorAgain,onOff)
+		if(self.Exploded)then return end
+		local Dude=activator or activatorAgain
+		JMod_Owner(self,Dude)
+		local Time=CurTime()
+		if((self.ShiftAltUse)and(Dude:KeyDown(JMOD_CONFIG.AltFunctionKey))and(Dude:KeyDown(IN_SPEED)))then
+			return self:ShiftAltUse(Dude,tobool(onOff))
+		end
+		if(tobool(onOff))then
+			local State=self:GetState()
+			if(State<0)then return end
+			local Alt=Dude:KeyDown(JMOD_CONFIG.AltFunctionKey)
+			if(State==JMOD_EZ_STATE_OFF and Alt)then
+				self:Prime()
+                JMod_Hint(Dude, "grenade", self)
+            else
+                if not JMod_Hint(Dude, "prime", self) then JMod_Hint(Dude, "mininade", self) end
+			end
+			if self.Hints then  end
+			JMod_ThrowablePickup(Dude,self,self.HardThrowStr,self.SoftThrowStr)
+		end
+	end
 	
 	function ENT:PhysicsCollide(data,physobj)
 		if((not(IsValid(self.AttachedBomb)))and(self:IsPlayerHolding())and(data.HitEntity.EZdetonateOverride))then
@@ -60,6 +83,7 @@ if(SERVER)then
 		self.Exploded=true
 		local SelfPos=self:GetPos()
 		if(IsValid(self.AttachedBomb))then
+			JMod_Owner(self.AttachedBomb,self.Owner or self.AttachedBomb.Owner or game.GetWorld())
 			self.AttachedBomb:EZdetonateOverride(self)
 			JMod_Sploom(self.Owner,SelfPos,3)
 			self:Remove()

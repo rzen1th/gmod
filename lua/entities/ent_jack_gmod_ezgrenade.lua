@@ -115,8 +115,10 @@ if(SERVER)then
 			local Alt=Dude:KeyDown(JMOD_CONFIG.AltFunctionKey)
 			if(State==JMOD_EZ_STATE_OFF and Alt)then
 				self:Prime()
+                JMod_Hint(Dude, "grenade", self)
+            else
+                JMod_Hint(Dude, "prime", self)
 			end
-			if self.Hints then JMod_Hint(activator,unpack(self.Hints)) end
 			JMod_ThrowablePickup(Dude,self,self.HardThrowStr,self.SoftThrowStr)
 		end
 	end
@@ -129,8 +131,7 @@ if(SERVER)then
 			if self.SpoonSound then Spewn.Sound = self.SpoonSound end
 			Spewn:SetPos(self:GetPos())
 			Spewn:Spawn()
-			Spewn:Activate()
-			Spewn:GetPhysicsObject():SetVelocity(self:GetPhysicsObject():GetVelocity()+VectorRand()*750)
+			Spewn:GetPhysicsObject():SetVelocity(self:GetPhysicsObject():GetVelocity()+VectorRand()*250)
 			self:EmitSound("snd_jack_spoonfling.wav",60,math.random(90,110))
 		end
 	end
