@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "Shot Revolver"
+SWEP.PrintName = "Judge"
 
 SWEP.Slot = 1
 

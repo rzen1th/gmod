@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "Sniper Rifle"
+SWEP.PrintName = "M40A3"
 
 SWEP.Slot = 3
 

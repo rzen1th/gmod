@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "Carbine"
+SWEP.PrintName = "G36C"
 
 SWEP.Slot = 2
 

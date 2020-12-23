@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "Sub Machine Gun"
+SWEP.PrintName = "MP5A5"
 
 SWEP.Slot = 2
 

@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "Revolver"
+SWEP.PrintName = "Python"
 
 SWEP.Slot = 1
 

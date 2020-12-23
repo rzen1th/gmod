@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "Single-Shot Rifle"
+SWEP.PrintName = "Martini-Henry"
 
 SWEP.Slot = 3
 

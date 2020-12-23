@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "Fully-Automatic Shotgun"
+SWEP.PrintName = "AA-12"
 
 SWEP.Slot = 3
 

@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "Anti-Materiel Rifle"
+SWEP.PrintName = "M82A1"
 
 SWEP.Slot = 3
 

@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "Semi-Automatic Shotgun"
+SWEP.PrintName = "M1014"
 
 SWEP.Slot = 3
 

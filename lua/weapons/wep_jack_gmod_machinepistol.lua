@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "Machine Pistol"
+SWEP.PrintName = "MAC-11"
 
 SWEP.Slot = 1
 

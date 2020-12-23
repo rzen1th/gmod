@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "Assault Rifle"
+SWEP.PrintName = "M16A4"
 
 SWEP.Slot = 2
 
@@ -21,7 +21,7 @@ SWEP.Primary.ClipSize = 30 -- DefaultClip is automatically set.
 
 SWEP.Recoil = .5
 
-SWEP.Delay = 60 / 750 -- 60 / RPM.
+SWEP.Delay = 60 / 900 -- 60 / RPM.
 SWEP.Firemodes = {
     {
         Mode = 2,

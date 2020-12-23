@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "Light Machine Gun"
+SWEP.PrintName = "M249 SAW"
 
 SWEP.Slot = 2
 
@@ -22,7 +22,7 @@ SWEP.ChamberSize = 0 -- open-bolt firearm lol
 
 SWEP.Recoil = .45
 
-SWEP.Delay = 60 / 750 -- 60 / RPM.
+SWEP.Delay = 60 / 900 -- 60 / RPM.
 SWEP.Firemodes = {
     {
         Mode = 2,

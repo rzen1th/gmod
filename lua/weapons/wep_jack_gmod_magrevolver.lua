@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "Magnum Revolver"
+SWEP.PrintName = "Anaconda"
 
 SWEP.Slot = 1
 

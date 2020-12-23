@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "Bolt Action Rifle"
+SWEP.PrintName = "R700"
 
 SWEP.Slot = 3
 

@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "Medium Machine Gun"
+SWEP.PrintName = "M240B"
 
 SWEP.Slot = 2
 
@@ -32,7 +32,7 @@ SWEP.ChamberSize = 0 -- open-bolt firearm lol
 
 SWEP.Recoil = .8 -- hevy gun
 
-SWEP.Delay = 60 / 550 -- 60 / RPM.
+SWEP.Delay = 60 / 600 -- 60 / RPM.
 SWEP.Firemodes = {
     {
         Mode = 2,

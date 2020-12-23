@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "Pump-Action Shotgun"
+SWEP.PrintName = "W1200"
 
 SWEP.Slot = 3
 

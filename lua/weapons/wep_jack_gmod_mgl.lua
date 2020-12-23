@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "Multiple Grenade Launcher"
+SWEP.PrintName = "MGL-32"
 
 SWEP.Slot = 4
 

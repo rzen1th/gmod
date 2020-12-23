@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "Break-Action Shotgun"
+SWEP.PrintName = "Citori 725"
 
 SWEP.Slot = 3
 

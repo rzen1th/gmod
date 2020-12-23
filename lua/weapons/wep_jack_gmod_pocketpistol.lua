@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "Pocket Pistol"
+SWEP.PrintName = "USP Small Edition"
 
 SWEP.Slot = 1
 

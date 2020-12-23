@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "Magnum Pistol"
+SWEP.PrintName = "Desert Eagle"
 
 SWEP.Slot = 1
 

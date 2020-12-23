@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "Pistol"
+SWEP.PrintName = "B23R"
 
 SWEP.Slot = 1
 

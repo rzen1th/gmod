@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "Plinking Pistol"
+SWEP.PrintName = "USP Baby Edition"
 
 SWEP.Slot = 1
 
