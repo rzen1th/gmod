@@ -37,8 +37,8 @@ SWEP.AccuracyMOA = 4 -- accuracy in Minutes of Angle. There are 60 MOA in a degr
 
 SWEP.Primary.Ammo = "Light Rifle Round" -- what ammo type the gun uses
 
-SWEP.FirstShootSound = "snds_jack_gmod/ez_weapons/light_rifle.wav"
-SWEP.ShootSound = "snds_jack_gmod/ez_weapons/light_rifle.wav"
+SWEP.FirstShootSound = "snds_jack_gmod/ez_weapons/lmg_first.wav"
+SWEP.ShootSound = "snds_jack_gmod/ez_weapons/lmg.wav"
 SWEP.DistantShootSound = "snds_jack_gmod/ez_weapons/rifle_far.wav"
 SWEP.ShootSoundExtraMult=1
 
