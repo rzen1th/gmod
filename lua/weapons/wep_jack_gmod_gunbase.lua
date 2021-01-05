@@ -13,7 +13,7 @@ SWEP.ShootEntity = nil -- entity to fire, if any
 SWEP.MuzzleVelocity = 900 -- projectile or phys bullet muzzle velocity
 -- IN M/S
 
-SWEP.TracerNum = 0 -- tracer every X
+SWEP.TracerNum = 4 -- tracer every X
 SWEP.TracerCol = Color(255, 25, 25)
 SWEP.TracerWidth = 3
 SWEP.AimSwayFactor = 0
@@ -224,36 +224,6 @@ end
 hook.Add("CreateMove","JMod_CreateMove",function(cmd)
 	local ply=LocalPlayer()
 	if not(ply:Alive())then return end
-	local Wep=ply:GetActiveWeapon()
-	if((Wep)and(IsValid(Wep))and(Wep.AimSwayFactor)and(Wep.GetState)and(Wep:GetState() == ArcCW.STATE_SIGHTS))then
-		local GlobalMult=(JMOD_CONFIG and JMOD_CONFIG.WeaponSwayMult) or 1
-		local Amt,Sporadicness,FT=20*Wep.AimSwayFactor*GlobalMult,20,FrameTime()
-		if(ply:Crouching())then Amt=Amt*.65 end
-		if((Wep.InBipod)and(Wep:InBipod()))then Amt=Amt*.25 end
-		if((ply:KeyDown(IN_FORWARD))or(ply:KeyDown(IN_BACK))or(ply:KeyDown(IN_MOVELEFT))or(ply:KeyDown(IN_MOVERIGHT)))then
-			Sporadicness=Sporadicness*1.5
-			Amt=Amt*2
-		else
-			local Key=(JMOD_CONFIG and JMOD_CONFIG.AltFunctionKey) or IN_WALK
-			if(ply:KeyDown(Key))then
-				StabilityStamina=math.Clamp(StabilityStamina-FT*40,0,100)
-				if(StabilityStamina>0)then
-					FocusIn(Wep)
-					Amt=Amt*.4
-				else
-					FocusOut(Wep)
-				end
-			else
-				StabilityStamina=math.Clamp(StabilityStamina+FT*30,0,100)
-				FocusOut(Wep)
-			end
-		end
-		local S,EAng=.05,cmd:GetViewAngles()
-		WDir=(WDir+FT*VectorRand()*Sporadicness):GetNormalized()
-		EAng.pitch=math.NormalizeAngle(EAng.pitch+WDir.z*FT*Amt*S)
-		EAng.yaw=math.NormalizeAngle(EAng.yaw+WDir.x*FT*Amt*S)
-		cmd:SetViewAngles(EAng)
-	end
 	if(input.WasKeyPressed(KEY_BACKSPACE))then
 		if not((ply:IsTyping())or(gui.IsConsoleVisible()))then
 			RunConsoleCommand("jmod_ez_dropweapon")
@@ -302,9 +272,6 @@ function SWEP:OnDrop()
 		self:Remove()
 	end
 end
-
-hook.Add("OnEntityCreated", "lol", function() hook.Remove("CreateMove","JMod_CreateMove") end)
---thanks datae, fuck you jack
 
 -- customization
 function SWEP:ToggleCustomizeHUD(ic)
