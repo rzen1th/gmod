@@ -44,7 +44,7 @@ SWEP.DistantShootSound = "snds_jack_gmod/ez_weapons/shotgun_far.wav"
 SWEP.ShootSoundExtraMult=1
 
 SWEP.MuzzleEffect = "muzzleflash_m3"
-SWEP.ShellModel = "models/jhells/shell_12gauge.mdl"
+SWEP.ShellModel = "models/shells/shell_12gauge.mdl"
 SWEP.ShellPitch = 90
 if(ArcCW)then SWEP.ShellSounds = ArcCW.ShotgunShellSoundsTable end
 SWEP.ShellScale = 3

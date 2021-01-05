@@ -43,7 +43,7 @@ SWEP.DistantShootSound = "snds_jack_gmod/ez_weapons/rifle_far.wav"
 SWEP.ShootSoundExtraMult=1
 
 SWEP.MuzzleEffect = "muzzleflash_4"
-SWEP.ShellModel = "models/jhells/shell_556.mdl"
+SWEP.ShellModel = "models/shells/shell_556.mdl"
 SWEP.ShellPitch = 95
 SWEP.ShellScale = 1.75
 

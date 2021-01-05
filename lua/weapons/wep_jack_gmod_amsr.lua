@@ -45,7 +45,7 @@ SWEP.DistantShootSound = "snds_jack_gmod/ez_weapons/rifle_far.wav"
 SWEP.ShootSoundExtraMult=2
 
 SWEP.MuzzleEffect = "muzzle_center_M82"
-SWEP.ShellModel = "models/jhells/shell_762nato.mdl"
+SWEP.ShellModel = "models/shells/shell_762nato.mdl"
 SWEP.ShellPitch = 70
 SWEP.ShellScale = 4
 

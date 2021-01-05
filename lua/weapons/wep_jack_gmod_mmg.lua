@@ -47,13 +47,13 @@ SWEP.AccuracyMOA = 4 -- accuracy in Minutes of Angle. There are 60 MOA in a degr
 
 SWEP.Primary.Ammo = "Medium Rifle Round" -- what ammo type the gun uses
 
-SWEP.FirstShootSound = "snds_jack_gmod/ez_weapons/medium_rifle.wav"
-SWEP.ShootSound = "snds_jack_gmod/ez_weapons/medium_rifle.wav"
+SWEP.FirstShootSound = "snds_jack_gmod/ez_weapons/mmg_first.wav"
+SWEP.ShootSound = "snds_jack_gmod/ez_weapons/mmg.wav"
 SWEP.DistantShootSound = "snds_jack_gmod/ez_weapons/rifle_far.wav"
 SWEP.ShootSoundExtraMult=1
 
 SWEP.MuzzleEffect = "muzzleflash_g3"
-SWEP.ShellModel = "models/jhells/shell_762nato.mdl"
+SWEP.ShellModel = "models/shells/shell_762nato.mdl"
 SWEP.ShellPitch = 80
 SWEP.ShellScale = 2
 
