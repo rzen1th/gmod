@@ -4,6 +4,9 @@ SWEP.Category = "JMod - EZ Weapons" -- edit this if you like
 SWEP.AdminOnly = false
 SWEP.EZdroppable = true
 
+SWEP.Trivia_Desc = ""
+SWEP.Trivia_Class = ""
+
 SWEP.UseHands = true
 
 SWEP.DefaultBodygroups = "000000"
@@ -274,9 +277,10 @@ function SWEP:OnDrop()
 end
 
 -- customization
-function SWEP:ToggleCustomizeHUD(ic)
+-- function SWEP:ToggleCustomizeHUD(ic)
 	-- jmod will have its own customization system
-end
+	-- no, fuck you -zenith
+-- end
 -- arctic's bash code is REALLY bad tbh
 --[[ -- TODO: do this when we introduce melee weps
 function SWEP:Bash(melee2)
