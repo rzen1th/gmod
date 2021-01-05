@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "USP Small Edition"
+SWEP.PrintName = "HK USP"
 
 SWEP.Slot = 1
 
@@ -25,7 +25,7 @@ JMod_ApplyAmmoSpecs(SWEP,"Pistol Round")
 
 SWEP.HipDispersion = 1100
 
-SWEP.Primary.ClipSize = 6 -- DefaultClip is automatically set.
+SWEP.Primary.ClipSize = 12 -- DefaultClip is automatically set.
 
 SWEP.Recoil = 1.5
 

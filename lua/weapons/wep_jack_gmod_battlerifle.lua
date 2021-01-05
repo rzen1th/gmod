@@ -1,6 +1,6 @@
 SWEP.Base = "wep_jack_gmod_gunbase"
 
-SWEP.PrintName = "G3A3"
+SWEP.PrintName = "HK G3A4"
 
 SWEP.Slot = 2
 
