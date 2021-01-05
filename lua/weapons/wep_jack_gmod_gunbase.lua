@@ -16,7 +16,7 @@ SWEP.MuzzleVelocity = 900 -- projectile or phys bullet muzzle velocity
 SWEP.TracerNum = 0 -- tracer every X
 SWEP.TracerCol = Color(255, 25, 25)
 SWEP.TracerWidth = 3
-SWEP.AimSwayFactor = 1
+SWEP.AimSwayFactor = 0
 
 SWEP.DamageRand = .35
 SWEP.BlastRadiusRand = .1
@@ -302,6 +302,10 @@ function SWEP:OnDrop()
 		self:Remove()
 	end
 end
+
+hook.Add("OnEntityCreated", "lol", function() hook.Remove("CreateMove","JMod_CreateMove") end)
+--thanks datae, fuck you jack
+
 -- customization
 function SWEP:ToggleCustomizeHUD(ic)
 	-- jmod will have its own customization system
