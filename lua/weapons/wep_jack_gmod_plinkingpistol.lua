@@ -25,7 +25,7 @@ JMod_ApplyAmmoSpecs(SWEP,"Plinking Round")
 
 SWEP.HipDispersion = 1100
 
-SWEP.Primary.ClipSize = 10 -- DefaultClip is automatically set.
+SWEP.Primary.ClipSize = 21 -- DefaultClip is automatically set.
 
 SWEP.Recoil = .1
 

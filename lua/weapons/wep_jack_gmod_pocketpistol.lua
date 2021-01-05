@@ -8,6 +8,10 @@ SWEP.ViewModel = "models/weapons/v_jmod_usp.mdl"
 SWEP.WorldModel = "models/weapons/w_jmod_usp.mdl"
 SWEP.ViewModelFOV = 70
 
+SWEP.TracerNum = 4 -- tracer every X
+SWEP.TracerCol = Color(255, 25, 25)
+SWEP.TracerWidth = 3
+
 --[[ -- pocket pistol goes in pocket ^:)
 SWEP.BodyHolsterSlot = "thighs"
 SWEP.BodyHolsterAng = Angle(90,90,-20)

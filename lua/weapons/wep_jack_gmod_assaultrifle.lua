@@ -23,7 +23,7 @@ JMod_ApplyAmmoSpecs(SWEP,"Light Rifle Round")
 
 SWEP.Primary.ClipSize = 30 -- DefaultClip is automatically set.
 
-SWEP.Recoil = .5
+SWEP.Recoil = .15
 
 SWEP.Delay = 60 / 900 -- 60 / RPM.
 SWEP.Firemodes = {
