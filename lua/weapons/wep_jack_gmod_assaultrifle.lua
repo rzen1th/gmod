@@ -8,6 +8,10 @@ SWEP.ViewModel = "models/weapons/v_cod4_m16a4.mdl"
 SWEP.WorldModel = "models/weapons/w_jmod_m16.mdl"
 SWEP.ViewModelFOV = 65
 
+SWEP.TracerNum = 4 -- tracer every X
+SWEP.TracerCol = Color(255, 25, 25)
+SWEP.TracerWidth = 3
+
 SWEP.BodyHolsterSlot = "back"
 SWEP.BodyHolsterAng = Angle(185,15,180)
 SWEP.BodyHolsterAngL = Angle(0,195,170)
@@ -44,7 +48,7 @@ SWEP.DistantShootSound = "snds_jack_gmod/ez_weapons/rifle_far.wav"
 SWEP.ShootSoundExtraMult=1
 
 SWEP.MuzzleEffect = "muzzleflash_4"
-SWEP.ShellModel = "models/jhells/shell_556.mdl"
+SWEP.ShellModel = "models/shells/shell_556.mdl"
 SWEP.ShellPitch = 95
 SWEP.ShellScale = 1.75
 
