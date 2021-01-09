@@ -16,13 +16,13 @@ SWEP.ShootEntity = nil -- entity to fire, if any
 SWEP.MuzzleVelocity = 900 -- projectile or phys bullet muzzle velocity
 -- IN M/S
 
-SWEP.TracerNum = 4 -- tracer every X
+SWEP.TracerNum = 1 -- tracer every X
 SWEP.TracerCol = Color(255, 25, 25)
 SWEP.TracerWidth = 3
 SWEP.AimSwayFactor = 0
 
-SWEP.DamageRand = .35
-SWEP.BlastRadiusRand = .1
+SWEP.DamageRand = 0
+SWEP.BlastRadiusRand = 0
 SWEP.Num = 1
 
 SWEP.VisualRecoilMult = 1
