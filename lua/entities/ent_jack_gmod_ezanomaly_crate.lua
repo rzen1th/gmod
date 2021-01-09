@@ -4,8 +4,8 @@ ENT.Type="anim"
 ENT.PrintName="T H E   C R A T E"
 ENT.Author="Jackarunda"
 ENT.NoSitAllowed=true
-ENT.Spawnable=false
-ENT.AdminSpawnable=false
+ENT.Spawnable=true
+ENT.AdminSpawnable=true
 ---
 ENT.JModPreferredCarryAngles=Angle(0,0,0)
 ENT.DamageThreshold=120

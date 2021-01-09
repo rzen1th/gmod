@@ -6,15 +6,15 @@ SWEP.PrintName	= "EZ Target Designator"
 SWEP.Author		= "Jackarunda"
 SWEP.Purpose	= ""
 
-SWEP.Spawnable	= false
+SWEP.Spawnable	= true
 SWEP.UseHands	= true
 SWEP.DrawAmmo	= false
 SWEP.DrawCrosshair=false
 
 SWEP.EZdroppable=true
 
-SWEP.ViewModel	= "models/saraphines/binoculars/binoculars_sniper/binoculars_sniper.mdl"
-SWEP.WorldModel	= "models/saraphines/binoculars/binoculars_sniper/binoculars_sniper.mdl"
+SWEP.ViewModel	= "models/weapons/c_pistol.mdl"
+SWEP.WorldModel	= "models/weapons/w_pistol.mdl"
 
 SWEP.ViewModelFOV	= 40
 SWEP.Slot			= 0
