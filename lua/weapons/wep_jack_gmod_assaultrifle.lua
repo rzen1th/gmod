@@ -8,7 +8,7 @@ SWEP.ViewModel = "models/weapons/v_cod4_m16a4.mdl"
 SWEP.WorldModel = "models/weapons/w_jmod_m16.mdl"
 SWEP.ViewModelFOV = 65
 
-SWEP.TracerNum = 4 -- tracer every X
+SWEP.TracerNum = 1 -- tracer every X
 SWEP.TracerCol = Color(255, 25, 25)
 SWEP.TracerWidth = 3
 
